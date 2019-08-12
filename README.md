@@ -4,11 +4,20 @@
   </p>
   <p align="center">A easy php snowflake id generator.</p>
   <p align="center">
+    <a href="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/">
+      <image src="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/badges/quality-score.png?b=master" alt="quality score">
+    </a>
+    <a href="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/">
+      <image src="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/badges/coverage.png?b=master" alt="php-snowflake">
+    </a>
     <a href="https://github.com/godruoyi/php-snowflake">
       <image src="https://poser.pugx.org/godruoyi/php-snowflake/license" alt="License">
     </a>
     <a href="https://packagist.org/packages/godruoyi/php-snowflake">
       <image src="https://poser.pugx.org/godruoyi/php-snowflake/v/stable" alt="Packagist Version">
+    </a>
+    <a href="https://packagist.org/packages/godruoyi/php-snowflake">
+      <image src="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/badges/build.png?b=master" alt="build passed">
     </a>
     <a href="https://packagist.org/packages/godruoyi/php-snowflake">
       <image src="https://poser.pugx.org/godruoyi/php-snowflake/downloads" alt="Total Downloads">
@@ -18,7 +27,8 @@
 
 ## Requirement
 
-
+1. PHP >= 7.0
+2. **[Composer](https://getcomposer.org/)**
 
 ## Installation
 
@@ -28,6 +38,40 @@ $ composer require godruoyi/php-snowflake -vvv
 
 ## Usage
 
-## senior
+```php
+$snowflake = new \Godruoyi\Snowflake\Snowflake;
 
-## MIT
+$snowflake->id();
+// 1537200202186752
+```
+
+## Advanced
+
+1. custom start timestamp.
+
+```php
+$snowflake = new \Godruoyi\Snowflake\Snowflake;
+$snowflake->setStartTimeStamp(strtotime('2019-09-09')*100)->id();
+```
+
+2. custom sequence resolver.
+
+```php
+$snowflake = new \Godruoyi\Snowflake\Snowflake;
+$snowflake->setSequenceResolver(function ($currentTime) {
+    static $lastTime;
+    static $sequence;
+
+    if ($lastTime == $currentTime) {
+        ++$sequence;
+    }
+
+    $lastTime = $currentTime;
+
+    return $sequence;
+})->id();
+```
+
+## License
+
+MIT

@@ -13,9 +13,13 @@ namespace Godruoyi\Snowflake;
 class Snowflake
 {
     const MAX_TIMESTAMP_LENGTH = 41;
+
     const MAX_DATACENTER_LENGTH = 5;
+
     const MAX_WORKID_LENGTH = 5;
+
     const MAX_SEQUENCE_LENGTH = 12;
+
     const MAX_FIRST_LENGTH = 1;
 
     /**

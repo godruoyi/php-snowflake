@@ -51,7 +51,7 @@ $snowflake->id();
 
 ```php
 $snowflake = new \Godruoyi\Snowflake\Snowflake;
-$snowflake->setStartTimeStamp(strtotime('2019-09-09')*100)->id();
+$snowflake->setStartTimeStamp(strtotime('2019-09-09')*1000)->id();
 ```
 
 2. custom sequence resolver.

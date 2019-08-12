@@ -1,6 +1,6 @@
 <div>
   <p align="center">
-    <image src="https://images.godruoyi.com/comments/201908/12/_1565616098_1UG2zcLjUn.png" width="250" height="250">
+    <image src="https://www.pngkey.com/png/full/105-1052235_snowflake-png-transparent-background-snowflake-with-clear-background.png" width="250" height="250">
   </p>
   <p align="center">A easy php snowflake id generator.</p>
   <p align="center">

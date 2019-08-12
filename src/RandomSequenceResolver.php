@@ -31,7 +31,7 @@ class RandomSequenceResolver implements SequenceResolver
      */
     public function sequence(int $currentTime)
     {
-        if ($this->lastTimeStamp == $currentTime) {
+        if ($this->lastTimeStamp === $currentTime) {
             ++$this->sequence;
         }
 

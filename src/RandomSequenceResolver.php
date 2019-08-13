@@ -33,8 +33,14 @@ class RandomSequenceResolver implements SequenceResolver
     {
         if ($this->lastTimeStamp === $currentTime) {
             ++$this->sequence;
+            $this->lastTimeStamp = $currentTime;
+
+            return $this->sequence;
         }
 
-        return $this->sequence;
+        $this->sequence = 0;
+        $this->lastTimeStamp = $currentTime;
+
+        return 0;
     }
 }

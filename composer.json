@@ -1,15 +1,17 @@
 {
     "name": "godruoyi/php-snowflake",
-    "description": "Package description here.",
+    "description": "An ID Generator for PHP based on Snowflake Algorithm (Twitter announced).",
     "license": "MIT",
     "keywords": [
-        "laravel idcard",
-        "identity",
-        "身份证",
-        "身份证验证",
-        "laravel 身份证验证"
+        "unique id",
+        "snowflake algorithm",
+        "php snowflake",
+        "laravel snowflake",
+        "order id",
+        "unique order id",
+        "php unique id",
     ],
-    "homepage": "https://github.com/godruoyi/laravel-idcard-validator",
+    "homepage": "https://github.com/godruoyi/php-snowflake",
     "authors": [
         {
             "name": "Godruoyi",

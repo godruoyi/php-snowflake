@@ -11,6 +11,8 @@
 namespace Tests;
 
 use Godruoyi\Snowflake\Snowflake;
+use Godruoyi\Snowflake\SequenceResolver;
+use Godruoyi\Snowflake\RandomSequenceResolver;
 
 class SnowflakeTest extends TestCase
 {
@@ -88,5 +90,68 @@ class SnowflakeTest extends TestCase
         }
 
         $this->assertTrue(1000 === count($datas));
+    }
+
+    public function testParseId()
+    {
+        $snowflake = new Snowflake(999, 20);
+        $data = $snowflake->parseId('1537200202186752');
+
+        $this->assertEquals($data['workerid'], '00000');
+        $this->assertEquals($data['datacenter'], '00000');
+        $this->assertEquals($data['sequence'], '000000000000');
+
+        $data = $snowflake->parseId('1537200202186752', true);
+
+        $this->assertTrue($data['workerid'] === 0);
+        $this->assertTrue($data['datacenter'] === 0);
+        $this->assertTrue($data['sequence'] === 0);
+    }
+
+    public function testGetCurrentMicrotime()
+    {
+        $snowflake = new Snowflake(999, 20);
+        $now       = floor(microtime(true) * 1000) | 0;
+        $time      = $snowflake->getCurrentMicrotime();
+
+        $this->assertTrue($now - $time >= 0);
+    }
+
+    public function testSetStartTimeStamp()
+    {
+        $snowflake = new Snowflake(999, 20);
+
+        $snowflake->setStartTimeStamp(1);
+        $this->assertTrue($snowflake->getStartTimeStamp() == 1);
+    }
+
+    public function testGetStartTimeStamp()
+    {
+        $snowflake = new Snowflake(999, 20);
+        $defaultTime = '2019-08-08 08:08:08';
+
+        $this->assertTrue($snowflake->getStartTimeStamp() == (strtotime($defaultTime) * 1000));
+
+        $snowflake->setStartTimeStamp(1);
+        $this->assertTrue($snowflake->getStartTimeStamp() == 1);
+    }
+
+    public function testGetSequenceResolver()
+    {
+        $snowflake = new Snowflake(999, 20);
+        $this->assertTrue(is_null($snowflake->getSequenceResolver()));
+
+        $snowflake->setSequenceResolver(function () {
+            return 1;
+        });
+
+        $this->assertTrue(is_callable($snowflake->getSequenceResolver()));
+    }
+
+    public function testGetDefaultSequenceResolver()
+    {
+        $snowflake = new Snowflake(999, 20);
+        $this->assertInstanceOf(SequenceResolver::class, $snowflake->getDefaultSequenceResolver());
+        $this->assertInstanceOf(RandomSequenceResolver::class, $snowflake->getDefaultSequenceResolver());
     }
 }

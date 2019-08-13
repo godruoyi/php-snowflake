@@ -17,7 +17,7 @@ class SwooleSequenceResolver implements SequenceResolver
      *
      * @var null
      */
-    protected $lastTimeStamp = null;
+    protected $lastTimeStamp = -1;
 
     /**
      * The sequence.

@@ -9,7 +9,7 @@
         "laravel snowflake",
         "order id",
         "unique order id",
-        "php unique id",
+        "php unique id"
     ],
     "homepage": "https://github.com/godruoyi/php-snowflake",
     "authors": [

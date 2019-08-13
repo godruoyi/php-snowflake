@@ -27,9 +27,9 @@
 
 ## 说明
 
-> Snowflake 是一种用于为 Twitter 内的对象生成唯一ID的服务。这些 ID 是唯一的 64 位无符号整数，它们基于时间而不是顺序。 完整 ID 由时间戳，工号和序列号组成。 使用JSON使用API时，
+雪花算法的 PHP 实现
 
-Snowflake 是一种用于为 Twitter 内对象生成唯一 ID 的服务。其生成的 ID 由 64 位无符号整数构成，
+![file](https://images.godruoyi.com/comments/201908/13/_1565668072_AbkRnhQaYk.png)
 
 其中：
 

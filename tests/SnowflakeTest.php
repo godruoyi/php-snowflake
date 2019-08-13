@@ -97,9 +97,9 @@ class SnowflakeTest extends TestCase
         $snowflake = new Snowflake(999, 20);
         $data = $snowflake->parseId('1537200202186752');
 
-        $this->assertEquals($data['workerid'], '00000');
-        $this->assertEquals($data['datacenter'], '00000');
-        $this->assertEquals($data['sequence'], '000000000000');
+        $this->assertSame($data['workerid'], '00000');
+        $this->assertSame($data['datacenter'], '00000');
+        $this->assertSame($data['sequence'], '000000000000');
 
         $data = $snowflake->parseId('1537200202186752', true);
 

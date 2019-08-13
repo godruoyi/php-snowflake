@@ -10,9 +10,9 @@
 
 namespace Tests;
 
-use Godruoyi\Snowflake\Snowflake;
-use Godruoyi\Snowflake\SequenceResolver;
 use Godruoyi\Snowflake\RandomSequenceResolver;
+use Godruoyi\Snowflake\SequenceResolver;
+use Godruoyi\Snowflake\Snowflake;
 
 class SnowflakeTest extends TestCase
 {
@@ -103,16 +103,16 @@ class SnowflakeTest extends TestCase
 
         $data = $snowflake->parseId('1537200202186752', true);
 
-        $this->assertTrue($data['workerid'] === 0);
-        $this->assertTrue($data['datacenter'] === 0);
-        $this->assertTrue($data['sequence'] === 0);
+        $this->assertTrue(0 === $data['workerid']);
+        $this->assertTrue(0 === $data['datacenter']);
+        $this->assertTrue(0 === $data['sequence']);
     }
 
     public function testGetCurrentMicrotime()
     {
         $snowflake = new Snowflake(999, 20);
-        $now       = floor(microtime(true) * 1000) | 0;
-        $time      = $snowflake->getCurrentMicrotime();
+        $now = floor(microtime(true) * 1000) | 0;
+        $time = $snowflake->getCurrentMicrotime();
 
         $this->assertTrue($now - $time >= 0);
     }
@@ -122,7 +122,7 @@ class SnowflakeTest extends TestCase
         $snowflake = new Snowflake(999, 20);
 
         $snowflake->setStartTimeStamp(1);
-        $this->assertTrue($snowflake->getStartTimeStamp() == 1);
+        $this->assertTrue(1 === $snowflake->getStartTimeStamp());
     }
 
     public function testGetStartTimeStamp()
@@ -130,10 +130,10 @@ class SnowflakeTest extends TestCase
         $snowflake = new Snowflake(999, 20);
         $defaultTime = '2019-08-08 08:08:08';
 
-        $this->assertTrue($snowflake->getStartTimeStamp() == (strtotime($defaultTime) * 1000));
+        $this->assertTrue($snowflake->getStartTimeStamp() === (strtotime($defaultTime) * 1000));
 
         $snowflake->setStartTimeStamp(1);
-        $this->assertTrue($snowflake->getStartTimeStamp() == 1);
+        $this->assertTrue(1 === $snowflake->getStartTimeStamp());
     }
 
     public function testGetSequenceResolver()

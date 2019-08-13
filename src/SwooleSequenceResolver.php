@@ -27,7 +27,7 @@ class SwooleSequenceResolver implements SequenceResolver
     protected $sequence = 0;
 
     /**
-     * The swoole lock
+     * The swoole lock.
      *
      * @var mixed
      */
@@ -36,12 +36,12 @@ class SwooleSequenceResolver implements SequenceResolver
     /**
      * The cycle count.
      *
-     * @var integer
+     * @var int
      */
     protected $count = 0;
 
     /**
-     * Init swoole lock
+     * Init swoole lock.
      */
     public function __construct()
     {
@@ -53,7 +53,7 @@ class SwooleSequenceResolver implements SequenceResolver
      */
     public function sequence(int $currentTime)
     {
-        /**
+        /*
          * If swoole lock failure，we return a bit number, This will cause the program to
          * perform the next millisecond operation.
          */

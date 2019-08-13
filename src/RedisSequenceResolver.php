@@ -11,6 +11,7 @@
 namespace Godruoyi\Snowflake;
 
 use Redis;
+use RedisException;
 
 class RedisSequenceResolver implements SequenceResolver
 {
@@ -35,7 +36,13 @@ class RedisSequenceResolver implements SequenceResolver
      */
     public function __construct(Redis $redis)
     {
-        $this->redis = $redis;
+        if ($redis->ping()) {
+            $this->redis = $redis;
+
+            return;
+        }
+
+        throw new RedisException('Redis server went away');
     }
 
     /**
@@ -45,11 +52,11 @@ class RedisSequenceResolver implements SequenceResolver
     {
         $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('psetex',KEYS[1],ARGV[2],ARGV[1])";
 
-        if ($this->redis->eval($lua, 1, $key = $this->prefix.$currentTime, 1, 1)) {
-            return $this->redis->incrby($key, 1);
+        if ($this->redis->eval($lua, [($key = $this->prefix.$currentTime), 1, 1], 1)) {
+            return 0;
         }
 
-        return 0;
+        return $this->redis->incrby($key, 1);
     }
 
     /**

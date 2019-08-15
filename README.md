@@ -27,7 +27,7 @@
 
 ## Description
 
-Snowflake algorithm PHP implementation[中文](https://github.com/godruoyi/php-snowflake/blob/master/README-zh_CN.md).
+Snowflake algorithm PHP implementation [中文文档](https://github.com/godruoyi/php-snowflake/blob/master/README-zh_CN.md).
 
 ![file](https://images.godruoyi.com/comments/201908/13/_1565668072_AbkRnhQaYk.png)
 
@@ -38,7 +38,7 @@ Snowflake is a network service for generating unique ID numbers at high scale wi
 * The 5 bits of the third and fourth parts represent data center and worker, and max value is 2^5 -1 = 31.
 * The last part consists of 12 bits, its means the length of the serial number generated per millisecond per working node, a maximum of 2^12 -1 = 4095 IDs can be generated in the same millisecond.
 
-⚠️⚠️⚠️⚠️
+### Note !!!
 
 * In a distributed environment, five-bit datacenter and worker mean that can deploy 31 datacenters, and each datacenter can deploy up to 31 nodes.
 * The binary length of 41 bits is at most 2^41 -1 millisecond = 69 years. So the snowflake algorithm can be used for up to 69 years, In order to maximize the use of the algorithm, you should specify a start time for it.

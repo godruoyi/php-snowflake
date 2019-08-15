@@ -27,7 +27,7 @@
 
 ## Description
 
-Snowflake algorithm PHP implementation[中文](x).
+Snowflake algorithm PHP implementation[中文](https://github.com/godruoyi/php-snowflake/blob/master/README-zh_CN.md).
 
 ![file](https://images.godruoyi.com/comments/201908/13/_1565668072_AbkRnhQaYk.png)
 

@@ -21,7 +21,7 @@ class SnowflakeTest extends TestCase
         $snowflake = new Snowflake();
 
         $this->assertTrue(!empty($snowflake->id()));
-        $this->assertTrue(16 === strlen($snowflake->id()));
+        $this->assertTrue(strlen($snowflake->id()) <= 19);
     }
 
     public function testWorkIDAndDataCenterId()
@@ -29,17 +29,17 @@ class SnowflakeTest extends TestCase
         $snowflake = new Snowflake(-1, -1);
 
         $this->assertTrue(!empty($snowflake->id()));
-        $this->assertTrue(16 === strlen($snowflake->id()));
+        $this->assertTrue(strlen($snowflake->id()) <= 19);
 
         $snowflake = new Snowflake(33, -1);
 
         $this->assertTrue(!empty($snowflake->id()));
-        $this->assertTrue(16 === strlen($snowflake->id()));
+        $this->assertTrue(strlen($snowflake->id()) <= 19);
 
         $snowflake = new Snowflake(1, 2);
 
         $this->assertTrue(!empty($snowflake->id()));
-        $this->assertTrue(16 === strlen($id = $snowflake->id()));
+        $this->assertTrue(strlen($id = $snowflake->id()) <= 19);
 
         $this->assertTrue(1 === $snowflake->parseId($id, true)['datacenter']);
         $this->assertTrue(2 === $snowflake->parseId($id, true)['workerid']);
@@ -123,6 +123,14 @@ class SnowflakeTest extends TestCase
 
         $snowflake->setStartTimeStamp(1);
         $this->assertTrue(1 === $snowflake->getStartTimeStamp());
+
+        $this->assertTrue(strlen($snowflake->id()) <= 19);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The starttime cannot be greater than current time and the maximum time difference is 2199023255551');
+
+        $snowflake = new Snowflake(-1, -1);
+        $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
     }
 
     public function testGetStartTimeStamp()

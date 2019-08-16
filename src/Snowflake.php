@@ -129,8 +129,9 @@ class Snowflake
      */
     public function setStartTimeStamp(int $startTime)
     {
-        if ($startTime > $this->getCurrentMicrotime()) {
-            throw new \Exception('The start time can not > current timestamp.');
+        $missTime = $this->getCurrentMicrotime() - $startTime;
+        if ($missTime < 0 || $missTime > ($maxTimeDiff = ((1 << self::MAX_TIMESTAMP_LENGTH) - 1))) {
+            throw new \Exception('The starttime cannot be greater than current time and the maximum time difference is '.$maxTimeDiff);
         }
 
         $this->startTime = $startTime;
@@ -149,6 +150,7 @@ class Snowflake
             return $this->startTime;
         }
 
+        // We set a default start time if you not set.
         $defaultTime = '2019-08-08 08:08:08';
 
         return strtotime($defaultTime) * 1000;

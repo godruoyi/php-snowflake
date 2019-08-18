@@ -7,19 +7,19 @@
     <a href="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/">
       <image src="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/badges/quality-score.png?b=master" alt="quality score">
     </a>
-<!--     <a href="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/">
-      <image src="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/badges/coverage.png?b=master" alt="php-snowflake">
-    </a> -->
+    <a href="https://github.com/godruoyi/php-snowflake">
+        <image src="https://github.styleci.io/repos/201936013/shield?branch=master" alt="godruoyi php-snowflake">
+    </a>
     <a href="https://github.com/godruoyi/php-snowflake">
       <image src="https://poser.pugx.org/godruoyi/php-snowflake/license" alt="License">
     </a>
     <a href="https://packagist.org/packages/godruoyi/php-snowflake">
       <image src="https://poser.pugx.org/godruoyi/php-snowflake/v/stable" alt="Packagist Version">
     </a>
-    <a href="https://packagist.org/packages/godruoyi/php-snowflake">
+    <a href="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/">
       <image src="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/badges/build.png?b=master" alt="build passed">
     </a>
-    <a href="https://packagist.org/packages/godruoyi/php-snowflake">
+    <a href="https://github.com/godruoyi/php-snowflake">
       <image src="https://poser.pugx.org/godruoyi/php-snowflake/downloads" alt="Total Downloads">
     </a>
   </p>
@@ -116,7 +116,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('snowflake', function () {
             return (new Snowflake())
                 ->setStartTimeStamp(strtotime('2019-10-10')*1000)
-                ->setSequenceResolver(new LaravelSequenceResolver($this->app->get('cache')));
+                ->setSequenceResolver(new LaravelSequenceResolver($this->app->get('cache')->store()));
         });
     }
 }

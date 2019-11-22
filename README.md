@@ -29,7 +29,7 @@
 
 Snowflake algorithm PHP implementation [中文文档](https://github.com/godruoyi/php-snowflake/blob/master/README-zh_CN.md).
 
-![file](https://images.godruoyi.com/comments/201908/13/_1565668072_AbkRnhQaYk.png)
+![file](https://images.godruoyi.com/logos/201908/13/_1565672621_LPW65Pi8cG.png)
 
 Snowflake is a network service for generating unique ID numbers at high scale with some simple guarantees.
 

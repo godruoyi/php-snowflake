@@ -45,7 +45,7 @@ class SwooleSequenceResolver implements SequenceResolver
      */
     public function __construct()
     {
-        $this->lock = new swoole_lock(SWOOLE_MUTEX);
+        $this->lock = new \swoole_lock(SWOOLE_MUTEX);
     }
 
     /**

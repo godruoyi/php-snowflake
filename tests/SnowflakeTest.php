@@ -74,6 +74,8 @@ class SnowflakeTest extends TestCase
 
             if ($lastTime === $currentTime) {
                 ++$sequence;
+            } else {
+                $sequence = 0;
             }
 
             $lastTime = $currentTime;
@@ -83,13 +85,13 @@ class SnowflakeTest extends TestCase
 
         $datas = [];
 
-        for ($i = 0; $i < 1000; ++$i) {
+        for ($i = 0; $i < 10000; ++$i) {
             $id = $snowflake->id();
 
             $datas[$id] = 1;
         }
 
-        $this->assertTrue(1000 === count($datas));
+        $this->assertTrue(10000 === count($datas));
     }
 
     public function testParseId()

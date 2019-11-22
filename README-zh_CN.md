@@ -158,6 +158,8 @@ $snowflake->setSequenceResolver(function ($currentTime) {
 
     if ($lastTime == $currentTime) {
         ++$sequence;
+    } else {
+        $sequence = 0;
     }
 
     $lastTime = $currentTime;

@@ -71,6 +71,7 @@ class SwooleSequenceResolver implements SequenceResolver
             ++$this->sequence;
         }
 
+        $this->sequence = 0;
         $this->lastTimeStamp = $currentTime;
 
         $this->lock->unlock();

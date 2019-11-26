@@ -69,6 +69,8 @@ class SwooleSequenceResolver implements SequenceResolver
 
         if ($this->lastTimeStamp === $currentTime) {
             ++$this->sequence;
+        } else {
+            $this->sequence = 0;
         }
 
         $this->lastTimeStamp = $currentTime;

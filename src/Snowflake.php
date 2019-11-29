@@ -51,6 +51,13 @@ class Snowflake
     protected $startTime;
 
     /**
+     * Default sequence resolver.
+     *
+     * @var \Godruoyi\Snowflake\SequenceResolver|null
+     */
+    protected $defaultSequenceResolver;
+
+    /**
      * Build Snowflake Instance.
      *
      * @param int $datacenter
@@ -185,7 +192,7 @@ class Snowflake
      */
     public function getDefaultSequenceResolver(): SequenceResolver
     {
-        return new RandomSequenceResolver();
+        return $this->defaultSequenceResolver ?: $this->defaultSequenceResolver = new RandomSequenceResolver();
     }
 
     /**

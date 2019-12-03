@@ -52,7 +52,7 @@ class RedisSequenceResolver implements SequenceResolver
     {
         $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('psetex',KEYS[1],ARGV[2],ARGV[1])";
 
-        if ($this->redis->eval($lua, [($key = $this->prefix.$currentTime), 1, 1], 1)) {
+        if ($this->redis->eval($lua, [($key = $this->prefix.$currentTime), 1, 1000], 1)) {
             return 0;
         }
 

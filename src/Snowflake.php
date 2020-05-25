@@ -76,7 +76,7 @@ class Snowflake
     /**
      * Get snowflake id.
      *
-     * @return int
+     * @return string
      */
     public function id()
     {

@@ -8,3 +8,4 @@ composer.lock
 .php_cs.cache
 tests/RedisTest.php
 composer.lock
+tests/LocalTest.php

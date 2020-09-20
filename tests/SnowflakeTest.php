@@ -129,7 +129,7 @@ class SnowflakeTest extends TestCase
         $this->assertTrue(strlen($snowflake->id()) <= 19);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The starttime cannot be greater than current time and the maximum time difference is 2199023255551');
+        $this->expectExceptionMessage('The maximum time length is 2^41, You can reset the start time to fix this');
 
         $snowflake = new Snowflake(-1, -1);
         $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
@@ -163,5 +163,20 @@ class SnowflakeTest extends TestCase
         $snowflake = new Snowflake(999, 20);
         $this->assertInstanceOf(SequenceResolver::class, $snowflake->getDefaultSequenceResolver());
         $this->assertInstanceOf(RandomSequenceResolver::class, $snowflake->getDefaultSequenceResolver());
+    }
+
+    public function testException()
+    {
+        $snowflake = new Snowflake;
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The start time cannot be greater than the current time');
+
+        $snowflake->setStartTimeStamp(time()*1000 + 1);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The maximum time length is 2^41, You can reset the start time to fix this');
+
+        $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
     }
 }

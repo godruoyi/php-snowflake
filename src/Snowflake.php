@@ -137,8 +137,11 @@ class Snowflake
     public function setStartTimeStamp(int $startTime)
     {
         $missTime = $this->getCurrentMicrotime() - $startTime;
-        if ($missTime < 0 || $missTime > ($maxTimeDiff = ((1 << self::MAX_TIMESTAMP_LENGTH) - 1))) {
-            throw new \Exception('The starttime cannot be greater than current time and the maximum time difference is '.$maxTimeDiff);
+
+        if ($missTime < 0) {
+            throw new \Exception('The start time cannot be greater than the current time');
+        } else if ($missTime > ($maxTimeDiff = ((1 << self::MAX_TIMESTAMP_LENGTH) - 1))) {
+            throw new \Exception(sprintf('The maximum time length is 2^%d, You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
         }
 
         $this->startTime = $startTime;

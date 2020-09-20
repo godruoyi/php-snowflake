@@ -23,8 +23,6 @@ class LaravelSequenceResolver implements SequenceResolver
 
     /**
      * Init resolve instance, must connectioned.
-     *
-     * @param \Illuminate\Contracts\Cache\Repository $cache
      */
     public function __construct(Repository $cache)
     {

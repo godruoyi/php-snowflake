@@ -98,10 +98,6 @@ class Snowflake
 
     /**
      * Parse snowflake id.
-     *
-     * @param string $id
-     *
-     * @return array
      */
     public function parseId(string $id, $transform = false): array
     {
@@ -131,8 +127,6 @@ class Snowflake
 
     /**
      * Set start time (millisecond).
-     *
-     * @param int $startTime
      */
     public function setStartTimeStamp(int $startTime)
     {
@@ -140,7 +134,7 @@ class Snowflake
 
         if ($missTime < 0) {
             throw new \Exception('The start time cannot be greater than the current time');
-        } else if ($missTime > ($maxTimeDiff = ((1 << self::MAX_TIMESTAMP_LENGTH) - 1))) {
+        } elseif ($missTime > ($maxTimeDiff = ((1 << self::MAX_TIMESTAMP_LENGTH) - 1))) {
             throw new \Exception(sprintf('The maximum time length is 2^%d, You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
         }
 

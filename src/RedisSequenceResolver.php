@@ -31,8 +31,6 @@ class RedisSequenceResolver implements SequenceResolver
 
     /**
      * Init resolve instance, must connectioned.
-     *
-     * @param Redis $redis
      */
     public function __construct(Redis $redis)
     {
@@ -61,8 +59,6 @@ class RedisSequenceResolver implements SequenceResolver
 
     /**
      * Set cacge prefix.
-     *
-     * @param string $prefix
      */
     public function setCachePrefix(string $prefix)
     {

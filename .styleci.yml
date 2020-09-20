@@ -1,5 +1,5 @@
 preset: symfony
-risky: false
+risky: true
 enabled:
   - strict
   - strict_param

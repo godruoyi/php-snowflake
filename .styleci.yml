@@ -1,6 +1,8 @@
 preset: symfony
-risky: true
+risky: false
+tab-width: 4
+use-tabs: false
 enabled:
   - strict
-  - strict_param
+  # - strict_param
   - ordered_use

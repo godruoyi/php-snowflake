@@ -129,7 +129,7 @@ class SnowflakeTest extends TestCase
         $this->assertTrue(strlen($snowflake->id()) <= 19);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The maximum time length is 2^41, You can reset the start time to fix this');
+        $this->expectExceptionMessage('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << 41), You can reset the start time to fix this');
 
         $snowflake = new Snowflake(-1, -1);
         $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
@@ -175,7 +175,7 @@ class SnowflakeTest extends TestCase
         $snowflake->setStartTimeStamp(time()*1000 + 1);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The maximum time length is 2^41, You can reset the start time to fix this');
+        $this->expectExceptionMessage('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << 41), You can reset the start time to fix this');
 
         $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
     }

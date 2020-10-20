@@ -140,8 +140,12 @@ class Snowflake
 
         if ($missTime < 0) {
             throw new \Exception('The start time cannot be greater than the current time');
-        } else if ($missTime > ($maxTimeDiff = ((1 << self::MAX_TIMESTAMP_LENGTH) - 1))) {
-            throw new \Exception(sprintf('The maximum time length is 2^%d, You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
+        }
+
+        $maxTimeDiff = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
+
+        if ($missTime > $maxTimeDiff) {
+            throw new \Exception(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
         }
 
         $this->startTime = $startTime;

@@ -98,10 +98,6 @@ class Snowflake
 
     /**
      * Parse snowflake id.
-     *
-     * @param string $id
-     *
-     * @return array
      */
     public function parseId(string $id, $transform = false): array
     {
@@ -131,8 +127,6 @@ class Snowflake
 
     /**
      * Set start time (millisecond).
-     *
-     * @param int $startTime
      */
     public function setStartTimeStamp(int $startTime)
     {

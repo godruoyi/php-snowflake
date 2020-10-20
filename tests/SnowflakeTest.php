@@ -167,12 +167,12 @@ class SnowflakeTest extends TestCase
 
     public function testException()
     {
-        $snowflake = new Snowflake;
+        $snowflake = new Snowflake();
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The start time cannot be greater than the current time');
 
-        $snowflake->setStartTimeStamp(time()*1000 + 1);
+        $snowflake->setStartTimeStamp(time() * 1000 + 1);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << 41), You can reset the start time to fix this');

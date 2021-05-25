@@ -34,19 +34,12 @@ class LaravelSequenceResolver implements SequenceResolver
      */
     public function sequence(int $currentTime)
     {
-        $store = $this->cache->getStore();
+        $key = $currentTime;
 
-        if ($store instanceof \Illuminate\Cache\RedisStore) {
-            $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('psetex',KEYS[1],ARGV[2],ARGV[1])";
-            if ($store->connection()->eval($lua, 1, $key = $currentTime, 1, 1000)) {
-                return 0;
-            }
-
-            return $store->connection()->incrby($key, 1);
+        if ($this->cache->add($key, 1, 1)) {
+            return 0;
         }
 
-        // Currently we only implement the redis driver, other drivers
-        // are waiting for your implementation ~_~.
-        throw new \Exception('Unsupported laravel cache driver.');
+        return $this->cache->increment($key, 1);
     }
 }

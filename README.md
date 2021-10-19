@@ -75,7 +75,7 @@ $snowflake->id();
 // 1537200202186752
 ```
 
-2. Specify the data center ID and machine ID.
+2. Specify the both data center ID and machine ID.
 
 ```php
 $snowflake = new \Godruoyi\Snowflake\Snowflake($datacenterId, $workerId);

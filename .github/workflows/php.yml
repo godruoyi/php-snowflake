@@ -1,0 +1,14 @@
+jobs:
+  run:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        php-versions: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
+        phpunit-versions: ['latest']
+    steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        tools: php-cs-fixer, phpunit:${{ matrix.phpunit-versions }}

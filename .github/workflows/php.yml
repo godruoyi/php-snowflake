@@ -1,3 +1,13 @@
+name: php
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+  push:
+    branches:
+      - master
+      - dev
 jobs:
   run:
     runs-on: ${{ matrix.operating-system }}

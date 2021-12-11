@@ -23,16 +23,8 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
-        tools: composer:v2
+        tools: composer:v2, php-cs-fixer
         coverage: none
-
-    - name: Set Minimum PHP 8.1 Versions
-      uses: nick-invision/retry@v1
-      with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require phpunit/phpunit:^9.5.8 --no-interaction --no-update
-      if: matrix.php-versions >= 8.1
 
     - name: Install dependencies
       uses: nick-invision/retry@v1
@@ -41,5 +33,45 @@ jobs:
         max_attempts: 5
         command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
+    - name: Coding Guidelines
+      run: php-cs-fixer
+
     - name: PHPUnit Test
       run: vendor/bin/phpunit --verbose
+
+  code-coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - 8.0
+        dependencies:
+          - highest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Install lowest dependencies with composer
+        if: matrix.dependencies == 'lowest'
+        run: composer update --no-ansi --no-interaction --no-progress --prefer-lowest
+
+      - name: Install highest dependencies with composer
+        if: matrix.dependencies == 'highest'
+        run: composer update --no-ansi --no-interaction --no-progress
+
+      - name: Collect code coverage with phpunit
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: Send code coverage report to Codecov.io
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

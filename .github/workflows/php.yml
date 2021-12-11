@@ -9,16 +9,37 @@ on:
       - master
       - dev
 jobs:
-  run:
+  phptests:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
         operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
         php-versions: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
-        phpunit-versions: ['latest']
     steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
-        tools: php-cs-fixer, phpunit:${{ matrix.phpunit-versions }}
+        tools: composer:v2
+        coverage: none
+
+    - name: Set Minimum PHP 8.1 Versions
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require phpunit/phpunit:^9.5.8 --no-interaction --no-update
+        if: matrix.php-versions >= 8.1
+
+    - name: Install dependencies
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+    - name: PHPUnit Test
+      run: vendor/bin/phpunit --verbose

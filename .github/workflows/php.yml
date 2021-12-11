@@ -27,19 +27,19 @@ jobs:
         coverage: none
 
     - name: Set Minimum PHP 8.1 Versions
-        uses: nick-invision/retry@v1
-        with:
+      uses: nick-invision/retry@v1
+      with:
           timeout_minutes: 5
           max_attempts: 5
           command: composer require phpunit/phpunit:^9.5.8 --no-interaction --no-update
-        if: matrix.php-versions >= 8.1
+      if: matrix.php-versions >= 8.1
 
     - name: Install dependencies
-        uses: nick-invision/retry@v1
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+      uses: nick-invision/retry@v1
+      with:
+        timeout_minutes: 5
+        max_attempts: 5
+        command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
     - name: PHPUnit Test
       run: vendor/bin/phpunit --verbose

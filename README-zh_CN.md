@@ -4,22 +4,19 @@
   </p>
   <p align="center">An ID Generator for PHP based on Snowflake Algorithm (Twitter announced).</p>
   <p align="center">
-    <a href="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/">
-      <image src="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/badges/quality-score.png?b=master" alt="quality score">
+    <a href="https://github.com/godruoyi/php-snowflake/actions/workflows/php.yml">
+      <image src="https://github.com/godruoyi/php-snowflake/workflows/php/badge.svg" alt="build passed">
     </a>
-<!--     <a href="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/">
-      <image src="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/badges/coverage.png?b=master" alt="php-snowflake">
-    </a> -->
+    <a href="https://codecov.io/gh/godruoyi/php-snowflake">
+      <img src="https://codecov.io/gh/godruoyi/php-snowflake/branch/master/graph/badge.svg?token=7AAOYCJK97"/>
+    </a>
     <a href="https://github.com/godruoyi/php-snowflake">
       <image src="https://poser.pugx.org/godruoyi/php-snowflake/license" alt="License">
     </a>
     <a href="https://packagist.org/packages/godruoyi/php-snowflake">
       <image src="https://poser.pugx.org/godruoyi/php-snowflake/v/stable" alt="Packagist Version">
     </a>
-    <a href="https://packagist.org/packages/godruoyi/php-snowflake">
-      <image src="https://scrutinizer-ci.com/g/godruoyi/php-snowflake/badges/build.png?b=master" alt="build passed">
-    </a>
-    <a href="https://packagist.org/packages/godruoyi/php-snowflake">
+    <a href="https://github.com/godruoyi/php-snowflake">
       <image src="https://poser.pugx.org/godruoyi/php-snowflake/downloads" alt="Total Downloads">
     </a>
   </p>

@@ -23,7 +23,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
-        tools: composer:v2, php-cs-fixer
+        tools: composer:v2
         coverage: none
 
     - name: Install dependencies
@@ -32,9 +32,6 @@ jobs:
         timeout_minutes: 5
         max_attempts: 5
         command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
-
-    - name: Coding Guidelines
-      run: php-cs-fixer
 
     - name: PHPUnit Test
       run: vendor/bin/phpunit --verbose
@@ -58,7 +55,10 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           coverage: pcov
-          tools: composer:v2
+          tools: composer:v2, php-cs-fixer
+
+      - name: Coding Guidelines
+        run: php-cs-fixer
 
       - name: Install lowest dependencies with composer
         if: matrix.dependencies == 'lowest'

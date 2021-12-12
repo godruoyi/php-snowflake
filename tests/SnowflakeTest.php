@@ -14,6 +14,10 @@ use Godruoyi\Snowflake\RandomSequenceResolver;
 use Godruoyi\Snowflake\SequenceResolver;
 use Godruoyi\Snowflake\Snowflake;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class SnowflakeTest extends TestCase
 {
     public function testBasic()
@@ -116,7 +120,7 @@ class SnowflakeTest extends TestCase
         $now = floor(microtime(true) * 1000) | 0;
         $time = $snowflake->getCurrentMicrotime();
 
-        $this->assertTrue($now - $time >= 0);
+        $this->assertTrue($time >= $now);
     }
 
     public function testSetStartTimeStamp()

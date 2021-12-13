@@ -45,7 +45,7 @@ jobs:
     - name: PHPUnit Test
       run: vendor/bin/phpunit --verbose
       env:
-          REDIS_HOST: redis
+        REDIS_HOST: redis
 
   code-coverage:
     name: Code Coverage

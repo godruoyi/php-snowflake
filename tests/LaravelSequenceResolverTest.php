@@ -12,12 +12,21 @@ namespace Tests;
 
 use Godruoyi\Snowflake\LaravelSequenceResolver;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class LaravelSequenceResolverTest extends TestCase
 {
     public function testBasic()
     {
         // $a = new LaravelSequenceResolver();
 
+        $this->assertTrue(true);
+    }
+
+    public function testSequence()
+    {
         $this->assertTrue(true);
     }
 }

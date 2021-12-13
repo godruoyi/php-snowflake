@@ -112,6 +112,15 @@ class SnowflakeTest extends TestCase
         $this->assertTrue(0 === $data['workerid']);
         $this->assertTrue(0 === $data['datacenter']);
         $this->assertTrue(0 === $data['sequence']);
+        $this->assertTrue($data['timestamp'] > 0);
+
+        $snowflake = new Snowflake(2, 3);
+        $id = $snowflake->id();
+        $payloads = $snowflake->parseId($id, true);
+
+        $this->assertTrue(2 === $payloads['datacenter']);
+        $this->assertTrue(3 === $payloads['workerid']);
+        $this->assertTrue(0 === $payloads['sequence']);
     }
 
     public function testGetCurrentMicrotime()
@@ -129,14 +138,24 @@ class SnowflakeTest extends TestCase
 
         $snowflake->setStartTimeStamp(1);
         $this->assertTrue(1 === $snowflake->getStartTimeStamp());
+    }
 
-        $this->assertTrue(strlen($snowflake->id()) <= 19);
-
+    public function testSetStartTimeStampMaxValueIsOver()
+    {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << 41), You can reset the start time to fix this');
 
         $snowflake = new Snowflake(-1, -1);
         $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
+    }
+
+    public function testSetStartTimeStampCannotMoreThatCurrentTime()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The start time cannot be greater than the current time');
+
+        $snowflake = new Snowflake(999, 20);
+        $snowflake->setStartTimeStamp(strtotime('3000-01-01') * 1000);
     }
 
     public function testGetStartTimeStamp()
@@ -148,6 +167,19 @@ class SnowflakeTest extends TestCase
 
         $snowflake->setStartTimeStamp(1);
         $this->assertTrue(1 === $snowflake->getStartTimeStamp());
+    }
+
+    public function testcallResolver()
+    {
+        $snowflake = new Snowflake(999, 20);
+        $snowflake->setSequenceResolver(function ($currentTime) {
+            return 999;
+        });
+
+        $seq = $snowflake->getSequenceResolver();
+
+        $this->assertTrue($seq instanceof \Closure);
+        $this->assertTrue(999 === $seq(0));
     }
 
     public function testGetSequenceResolver()

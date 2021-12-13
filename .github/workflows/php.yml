@@ -11,9 +11,15 @@ on:
 jobs:
   phptests:
     runs-on: ${{ matrix.operating-system }}
+
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
     strategy:
       matrix:
-        operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        operating-system: ['ubuntu-latest']
         php-versions: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
     steps:
     - name: Checkout
@@ -25,6 +31,7 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         tools: composer:v2
         coverage: none
+        extensions: swoole, redis
 
     - name: Install dependencies
       uses: nick-invision/retry@v1
@@ -35,6 +42,8 @@ jobs:
 
     - name: PHPUnit Test
       run: vendor/bin/phpunit --verbose
+      env:
+          REDIS_HOST: redis
 
   code-coverage:
     name: Code Coverage
@@ -56,6 +65,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           coverage: pcov
           tools: composer:v2, php-cs-fixer
+          extensions: swoole, redis
 
       - name: Coding Guidelines
         run: php-cs-fixer
@@ -70,6 +80,8 @@ jobs:
 
       - name: Collect code coverage with phpunit
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
+        env:
+          REDIS_HOST: redis
 
       - name: Send code coverage report to Codecov.io
         uses: codecov/codecov-action@v2

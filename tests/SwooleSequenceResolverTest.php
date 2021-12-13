@@ -12,12 +12,23 @@ namespace Tests;
 
 use Godruoyi\Snowflake\SwooleSequenceResolver;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class SwooleSequenceResolverTest extends TestCase
 {
     public function testBasic()
     {
-        // $a = new SwooleSequenceResolver();
+        $snowflake = new SwooleSequenceResolver();
 
-        $this->assertTrue(true);
+        $this->assertTrue(0 == $snowflake->sequence(0));
+        $this->assertTrue(1 == $snowflake->sequence(0));
+        $this->assertTrue(2 == $snowflake->sequence(0));
+        $this->assertTrue(3 == $snowflake->sequence(0));
+
+        $this->assertTrue(0 == $snowflake->sequence(1));
+        $this->assertTrue(1 == $snowflake->sequence(1));
+        $this->assertTrue(2 == $snowflake->sequence(1));
     }
 }

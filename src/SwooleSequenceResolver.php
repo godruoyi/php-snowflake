@@ -53,10 +53,7 @@ class SwooleSequenceResolver implements SequenceResolver
      */
     public function sequence(int $currentTime)
     {
-        /*
-         * If swoole lock failure，we return a bit number, This will cause the program to
-         * perform the next millisecond operation.
-         */
+        // If swoole lock failure，we will return a big number, and recall this method when next millisecond.
         if (!$this->lock->trylock()) {
             if ($this->count >= 10) {
                 throw new \Exception('Swoole lock failure, Unable to get the program lock after many attempts.');
@@ -64,6 +61,7 @@ class SwooleSequenceResolver implements SequenceResolver
 
             ++$this->count;
 
+            // return a big number
             return 999999;
         }
 

@@ -44,8 +44,6 @@ jobs:
 
     - name: PHPUnit Test
       run: vendor/bin/phpunit --verbose
-      env:
-        REDIS_HOST: redis
 
   code-coverage:
     name: Code Coverage
@@ -82,8 +80,6 @@ jobs:
 
       - name: Collect code coverage with phpunit
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
-        env:
-          REDIS_HOST: redis
 
       - name: Send code coverage report to Codecov.io
         uses: codecov/codecov-action@v2

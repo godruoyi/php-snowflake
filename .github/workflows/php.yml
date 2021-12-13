@@ -11,10 +11,18 @@ on:
 jobs:
   phptests:
     runs-on: ${{ matrix.operating-system }}
+
+    services:
+      redis:
+        image: redis:5.0
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
     strategy:
       matrix:
-        operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        php-versions: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
+        operating-system: ['ubuntu-latest']
+        php-versions: ['7.2', '7.3', '7.4', '8.0', '8.1']
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -25,6 +33,7 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         tools: composer:v2
         coverage: none
+        extensions: swoole, redis
 
     - name: Install dependencies
       uses: nick-invision/retry@v1
@@ -39,6 +48,14 @@ jobs:
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:5.0
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
     strategy:
       fail-fast: false
       matrix:
@@ -56,6 +73,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           coverage: pcov
           tools: composer:v2, php-cs-fixer
+          extensions: swoole, redis
 
       - name: Coding Guidelines
         run: php-cs-fixer

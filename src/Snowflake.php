@@ -12,15 +12,15 @@ namespace Godruoyi\Snowflake;
 
 class Snowflake
 {
-    const MAX_TIMESTAMP_LENGTH = 41;
+    public const MAX_TIMESTAMP_LENGTH = 41;
 
-    const MAX_DATACENTER_LENGTH = 5;
+    public const MAX_DATACENTER_LENGTH = 5;
 
-    const MAX_WORKID_LENGTH = 5;
+    public const MAX_WORKID_LENGTH = 5;
 
-    const MAX_SEQUENCE_LENGTH = 12;
+    public const MAX_SEQUENCE_LENGTH = 12;
 
-    const MAX_FIRST_LENGTH = 1;
+    public const MAX_FIRST_LENGTH = 1;
 
     /**
      * The data center id.
@@ -39,7 +39,7 @@ class Snowflake
     /**
      * The Sequence Resolver instance.
      *
-     * @var \Godruoyi\Snowflake\SequenceResolver|null
+     * @var null|\Godruoyi\Snowflake\SequenceResolver
      */
     protected $sequence;
 
@@ -53,7 +53,7 @@ class Snowflake
     /**
      * Default sequence resolver.
      *
-     * @var \Godruoyi\Snowflake\SequenceResolver|null
+     * @var null|\Godruoyi\Snowflake\SequenceResolver
      */
     protected $defaultSequenceResolver;
 
@@ -99,7 +99,7 @@ class Snowflake
     /**
      * Parse snowflake id.
      */
-    public function parseId(string $id, $transform = false): array
+    public function parseId(string $id, bool $transform = false): array
     {
         $id = decbin($id);
 
@@ -167,7 +167,7 @@ class Snowflake
     /**
      * Set Sequence Resolver.
      *
-     * @param SequenceResolver|callable $sequence
+     * @param callable|SequenceResolver $sequence
      */
     public function setSequenceResolver($sequence)
     {
@@ -179,7 +179,7 @@ class Snowflake
     /**
      * Get Sequence Resolver.
      *
-     * @return \Godruoyi\Snowflake\SequenceResolver|callable|null
+     * @return null|callable|\Godruoyi\Snowflake\SequenceResolver
      */
     public function getSequenceResolver()
     {
@@ -201,6 +201,7 @@ class Snowflake
      *
      * @param callable|\Godruoyi\Snowflake\SequenceResolver $resolver
      * @param int                                           $maxSequence
+     * @param mixed                                         $currentTime
      *
      * @return int
      */

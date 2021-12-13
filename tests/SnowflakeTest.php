@@ -14,6 +14,10 @@ use Godruoyi\Snowflake\RandomSequenceResolver;
 use Godruoyi\Snowflake\SequenceResolver;
 use Godruoyi\Snowflake\Snowflake;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class SnowflakeTest extends TestCase
 {
     public function testBasic()
@@ -97,7 +101,7 @@ class SnowflakeTest extends TestCase
     public function testParseId()
     {
         $snowflake = new Snowflake(999, 20);
-        $data = $snowflake->parseId('1537200202186752');
+        $data = $snowflake->parseId('1537200202186752', false);
 
         $this->assertSame($data['workerid'], '00000');
         $this->assertSame($data['datacenter'], '00000');
@@ -108,6 +112,21 @@ class SnowflakeTest extends TestCase
         $this->assertTrue(0 === $data['workerid']);
         $this->assertTrue(0 === $data['datacenter']);
         $this->assertTrue(0 === $data['sequence']);
+        $this->assertTrue($data['timestamp'] > 0);
+
+        $snowflake = new Snowflake(2, 3);
+        $id = $snowflake->id();
+        $payloads = $snowflake->parseId($id, true);
+
+        $this->assertTrue(2 === $payloads['datacenter']);
+        $this->assertTrue(3 === $payloads['workerid']);
+        $this->assertTrue(0 === $payloads['sequence']);
+
+        $payloads = $snowflake->parseId('0');
+        $this->assertTrue('' == $payloads['timestamp'] || false == $payloads['timestamp']);
+        $this->assertSame($payloads['workerid'], '0');
+        $this->assertSame($payloads['datacenter'], '0');
+        $this->assertSame($payloads['sequence'], '0');
     }
 
     public function testGetCurrentMicrotime()
@@ -116,7 +135,7 @@ class SnowflakeTest extends TestCase
         $now = floor(microtime(true) * 1000) | 0;
         $time = $snowflake->getCurrentMicrotime();
 
-        $this->assertTrue($now - $time >= 0);
+        $this->assertTrue($time >= $now);
     }
 
     public function testSetStartTimeStamp()
@@ -125,14 +144,24 @@ class SnowflakeTest extends TestCase
 
         $snowflake->setStartTimeStamp(1);
         $this->assertTrue(1 === $snowflake->getStartTimeStamp());
+    }
 
-        $this->assertTrue(strlen($snowflake->id()) <= 19);
-
+    public function testSetStartTimeStampMaxValueIsOver()
+    {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << 41), You can reset the start time to fix this');
 
         $snowflake = new Snowflake(-1, -1);
         $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
+    }
+
+    public function testSetStartTimeStampCannotMoreThatCurrentTime()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The start time cannot be greater than the current time');
+
+        $snowflake = new Snowflake(999, 20);
+        $snowflake->setStartTimeStamp(strtotime('3000-01-01') * 1000);
     }
 
     public function testGetStartTimeStamp()
@@ -144,6 +173,19 @@ class SnowflakeTest extends TestCase
 
         $snowflake->setStartTimeStamp(1);
         $this->assertTrue(1 === $snowflake->getStartTimeStamp());
+    }
+
+    public function testcallResolver()
+    {
+        $snowflake = new Snowflake(999, 20);
+        $snowflake->setSequenceResolver(function ($currentTime) {
+            return 999;
+        });
+
+        $seq = $snowflake->getSequenceResolver();
+
+        $this->assertTrue($seq instanceof \Closure);
+        $this->assertTrue(999 === $seq(0));
     }
 
     public function testGetSequenceResolver()

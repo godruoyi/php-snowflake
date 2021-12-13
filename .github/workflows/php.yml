@@ -14,9 +14,11 @@ jobs:
 
     services:
       redis:
-        image: redis:latest
+        image: redis:5.0
         ports:
           - 6379:6379
+        options: --entrypoint redis-server
+
     strategy:
       matrix:
         operating-system: ['ubuntu-latest']

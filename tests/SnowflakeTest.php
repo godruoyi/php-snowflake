@@ -101,7 +101,7 @@ class SnowflakeTest extends TestCase
     public function testParseId()
     {
         $snowflake = new Snowflake(999, 20);
-        $data = $snowflake->parseId('1537200202186752');
+        $data = $snowflake->parseId('1537200202186752', false);
 
         $this->assertSame($data['workerid'], '00000');
         $this->assertSame($data['datacenter'], '00000');
@@ -121,6 +121,12 @@ class SnowflakeTest extends TestCase
         $this->assertTrue(2 === $payloads['datacenter']);
         $this->assertTrue(3 === $payloads['workerid']);
         $this->assertTrue(0 === $payloads['sequence']);
+
+        $payloads = $snowflake->parseId('0');
+        $this->assertSame($payloads['timestamp'], '');
+        $this->assertSame($payloads['workerid'], '0');
+        $this->assertSame($payloads['datacenter'], '0');
+        $this->assertSame($payloads['sequence'], '0');
     }
 
     public function testGetCurrentMicrotime()

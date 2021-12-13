@@ -123,7 +123,7 @@ class SnowflakeTest extends TestCase
         $this->assertTrue(0 === $payloads['sequence']);
 
         $payloads = $snowflake->parseId('0');
-        $this->assertSame($payloads['timestamp'], '');
+        $this->assertTrue('' == $payloads['timestamp'] || false == $payloads['timestamp']);
         $this->assertSame($payloads['workerid'], '0');
         $this->assertSame($payloads['datacenter'], '0');
         $this->assertSame($payloads['sequence'], '0');

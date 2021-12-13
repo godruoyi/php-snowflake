@@ -5,7 +5,7 @@
   <p align="center">An ID Generator for PHP based on Snowflake Algorithm (Twitter announced).</p>
   <p align="center">
     <a href="https://github.com/godruoyi/php-snowflake/actions/workflows/php.yml">
-      <image src="https://github.com/godruoyi/php-snowflake/workflows/php/badge.svg" alt="build passed">
+      <image src="https://github.com/godruoyi/php-snowflake/actions/workflows/php.yml/badge.svg" alt="build passed">
     </a>
     <a href="https://codecov.io/gh/godruoyi/php-snowflake">
       <img src="https://codecov.io/gh/godruoyi/php-snowflake/branch/master/graph/badge.svg?token=7AAOYCJK97"/>

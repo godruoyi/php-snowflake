@@ -36,7 +36,7 @@ class LaravelSequenceResolver implements SequenceResolver
     {
         $key = $currentTime;
 
-        if ($this->cache->add($key, 1, 1)) {
+        if ($this->cache->add($key, 1, 10)) {
             return 0;
         }
 

@@ -32,12 +32,18 @@ class RedisSequenceResolver implements SequenceResolver
     /**
      * Init resolve instance, must connectioned.
      */
-    public function __construct(Redis $redis)
+    public function __construct($redis)
     {
-        if ($redis->ping()) {
-            $this->redis = $redis;
-
-            return;
+        if ($redis instanceof RedisCluster) {
+            if ($redis->_masters()) {
+                $this->redis = $redis;
+                return ;
+            }
+        } elseif ($redis instanceof Redis) {
+            if ($redis->ping()) {
+                $this->redis = $redis;
+                return ;
+            }
         }
 
         throw new RedisException('Redis server went away');

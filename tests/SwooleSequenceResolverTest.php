@@ -34,12 +34,14 @@ class SwooleSequenceResolverTest extends TestCase
 
     public function testResetLock() {
         $snowflake = new SwooleSequenceResolver();
+
         $lock = $this->createMock('Swoole\Lock');
         $lock->expects($this->any())->method('trylock')->willReturn(false);
+
         $snowflake->resetLock($lock);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Swoole lock failure, Unable to get the program lock after many attempts.');
-        $snowflake->id();
+        $snowflake->sequence(1);
     }
 }

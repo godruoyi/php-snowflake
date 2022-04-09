@@ -28,6 +28,27 @@ class SnowflakeTest extends TestCase
         $this->assertTrue(strlen($snowflake->id()) <= 19);
     }
 
+    public function testInvalidDatacenterIDAndWorkID() {
+        $snowflake = new Snowflake(-1, -1);
+
+        $dataID = $this->invokeProperty($snowflake, 'datacenter');
+        $workID = $this->invokeProperty($snowflake, 'workerid');
+        $this->assertTrue($workID >= 0 && $workID <= 31);
+        $this->assertTrue($dataID >= 0 && $dataID <= 31);
+
+        $snowflake = new Snowflake(33, 33);
+        $dataID = $this->invokeProperty($snowflake, 'datacenter');
+        $workID = $this->invokeProperty($snowflake, 'workerid');
+        $this->assertTrue($workID >= 0 && $workID <= 31);
+        $this->assertTrue($dataID >= 0 && $dataID <= 31);
+
+        $snowflake = new Snowflake();
+        $dataID = $this->invokeProperty($snowflake, 'datacenter');
+        $workID = $this->invokeProperty($snowflake, 'workerid');
+        $this->assertTrue($workID >= 0 && $workID <= 31);
+        $this->assertTrue($dataID >= 0 && $dataID <= 31);
+    }
+
     public function testWorkIDAndDataCenterId()
     {
         $snowflake = new Snowflake(-1, -1);

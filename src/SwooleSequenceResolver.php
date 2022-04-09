@@ -77,4 +77,13 @@ class SwooleSequenceResolver implements SequenceResolver
 
         return $this->sequence;
     }
+
+    /**
+     * @param \Swoole\Lock $lock
+     *
+     * @return void
+     */
+    public function resetLock(\Swoole\Lock $lock) {
+        $this->lock = $lock;
+    }
 }

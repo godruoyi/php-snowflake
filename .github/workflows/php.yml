@@ -42,6 +42,9 @@ jobs:
         max_attempts: 5
         command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
+    - name: Install Laravel Illuminate Contracts
+      run: composer require "illuminate/contracts"
+
     - name: PHPUnit Test
       run: vendor/bin/phpunit --verbose
 

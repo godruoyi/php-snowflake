@@ -238,4 +238,24 @@ class SnowflakeTest extends TestCase
 
         $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
     }
+
+    public function testGenerateID() {
+        $snowflake = new Snowflake(1, 1);
+        $snowflake->setStartTimeStamp(1);
+        $snowflake->setSequenceResolver(function ($t) {
+            global $startTime;
+
+            if (!$startTime) {
+                $startTime = time();
+            }
+
+            // sleep 5 seconds
+            if (time() - $startTime <= 5) {
+                return 4096;
+            }
+            return 1;
+        });
+
+        $this->assertNotEmpty($snowflake->id());
+    }
 }

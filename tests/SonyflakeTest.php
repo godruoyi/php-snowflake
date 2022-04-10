@@ -45,10 +45,21 @@ class SonyflakeTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Exceeding the maximum life cycle of the algorithm');
         $snowflake->setStartTimeStamp(strtotime('1840-01-01 00:00:00') * 1000); // 2021 - 1840 = 181 > The lifetime (174 years)
+    }
+
+    public function testSetStartTimeStampCannotGreaterThanCurrentTime () {
+        $snowflake = new Sonyflake(110);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The start time cannot be greater than the current time');
         $snowflake->setStartTimeStamp(strtotime('2345-01-01 00:00:00') * 1000);
+
+        $snowflake->setStartTimeStamp(1);
+        $this->assertEquals(1, $snowflake->getStartTimeStamp());
+    }
+
+    public function testSetStartTimeStampBasic () {
+        $snowflake = new Sonyflake(110);
 
         $snowflake->setStartTimeStamp(1);
         $this->assertEquals(1, $snowflake->getStartTimeStamp());
@@ -99,7 +110,7 @@ class SonyflakeTest extends TestCase
             }
 
             // sleep 10 seconds
-            if (time() <= 10) {
+            if (time() - $startTime <= 5) {
                 return 256;
             }
             return 1;

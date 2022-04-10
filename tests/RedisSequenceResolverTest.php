@@ -17,10 +17,10 @@ class RedisSequenceResolverTest extends TestCase
 {
     public function testInvalidRedisConnect() {
         $redis = $this->createMock(\Redis::class);
-        $redis->expects($this->once())->method('ping')->willThrowException(new \RedisException('foo'));
+        $redis->expects($this->once())->method('ping')->willReturn(false);
 
         $this->expectException(RedisException::class);
-        $this->expectExceptionMessage('foo');
+        $this->expectExceptionMessage('Redis server went away');
         new RedisSequenceResolver($redis);
     }
 

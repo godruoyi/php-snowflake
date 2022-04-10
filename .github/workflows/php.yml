@@ -11,14 +11,6 @@ on:
 jobs:
   phptests:
     runs-on: ${{ matrix.operating-system }}
-
-    services:
-      redis:
-        image: redis:5.0
-        ports:
-          - 6379:6379
-        options: --entrypoint redis-server
-
     strategy:
       matrix:
         operating-system: ['ubuntu-latest']
@@ -42,20 +34,15 @@ jobs:
         max_attempts: 5
         command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
+    - name: Install Laravel Illuminate Contracts
+      run: composer require "illuminate/contracts"
+
     - name: PHPUnit Test
       run: vendor/bin/phpunit --verbose
 
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
-
-    services:
-      redis:
-        image: redis:5.0
-        ports:
-          - 6379:6379
-        options: --entrypoint redis-server
-
     strategy:
       fail-fast: false
       matrix:
@@ -85,6 +72,9 @@ jobs:
       - name: Install highest dependencies with composer
         if: matrix.dependencies == 'highest'
         run: composer update --no-ansi --no-interaction --no-progress
+
+      - name: Install Laravel Illuminate Contracts
+        run: composer require "illuminate/contracts"
 
       - name: Collect code coverage with phpunit
         run: vendor/bin/phpunit --coverage-clover=coverage.xml

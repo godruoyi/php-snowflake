@@ -9,3 +9,4 @@ composer.lock
 tests/RedisTest.php
 composer.lock
 tests/LocalTest.php
+/.phpunit.result.cache

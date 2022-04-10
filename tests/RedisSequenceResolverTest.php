@@ -10,30 +10,42 @@
 
 namespace Tests;
 
+use RedisException;
 use Godruoyi\Snowflake\RedisSequenceResolver;
 
-/**
- * @internal
- * @coversNothing
- */
 class RedisSequenceResolverTest extends TestCase
 {
+    public function testInvalidRedisConnect() {
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->once())->method('ping')->willReturn(false);
+
+        $this->expectException(RedisException::class);
+        $this->expectExceptionMessage('Redis server went away');
+        new RedisSequenceResolver($redis);
+    }
+
     public function testSequence()
     {
-        $redis = new \Redis();
-        $redis->connect(getenv('REDIS_HOST') ?: '127.0.0.1');
-
-        $cachePrefix = 'test:';
-        $currentTime = floor(microtime(true) * 1000);
-        $cacheKey = $cachePrefix.$currentTime;
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->once())->method('ping')->willReturn(true);
+        $redis->method('eval')->withAnyParameters()->willReturn(0, 1, 2, 3);
 
         $snowflake = new RedisSequenceResolver($redis);
-        $snowflake->setCachePrefix($cachePrefix);
 
-        $this->assertTrue(0 == $snowflake->sequence($currentTime));
-        $this->assertTrue(1 == $snowflake->sequence($currentTime));
-        $this->assertTrue(2 == $snowflake->sequence($currentTime));
-        $this->assertTrue(3 == $snowflake->sequence($currentTime));
-        $this->assertTrue(3 == $redis->get($cacheKey));
+        $this->assertTrue(0 == $snowflake->sequence(1));
+        $this->assertTrue(1 == $snowflake->sequence(1));
+        $this->assertTrue(2 == $snowflake->sequence(1));
+        $this->assertTrue(3 == $snowflake->sequence(1));
+    }
+
+    public function testSetCachePrefix()
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects($this->once())->method('ping')->willReturn(true);
+
+        $snowflake = new RedisSequenceResolver($redis);
+        $snowflake->setCachePrefix('foo');
+
+       $this->assertEquals('foo', $this->invokeProperty($snowflake, 'prefix'));
     }
 }

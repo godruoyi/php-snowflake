@@ -14,10 +14,6 @@ use Godruoyi\Snowflake\RandomSequenceResolver;
 use Godruoyi\Snowflake\SequenceResolver;
 use Godruoyi\Snowflake\Snowflake;
 
-/**
- * @internal
- * @coversNothing
- */
 class SnowflakeTest extends TestCase
 {
     public function testBasic()
@@ -26,6 +22,27 @@ class SnowflakeTest extends TestCase
 
         $this->assertTrue(!empty($snowflake->id()));
         $this->assertTrue(strlen($snowflake->id()) <= 19);
+    }
+
+    public function testInvalidDatacenterIDAndWorkID() {
+        $snowflake = new Snowflake(-1, -1);
+
+        $dataID = $this->invokeProperty($snowflake, 'datacenter');
+        $workID = $this->invokeProperty($snowflake, 'workerid');
+        $this->assertTrue($workID >= 0 && $workID <= 31);
+        $this->assertTrue($dataID >= 0 && $dataID <= 31);
+
+        $snowflake = new Snowflake(33, 33);
+        $dataID = $this->invokeProperty($snowflake, 'datacenter');
+        $workID = $this->invokeProperty($snowflake, 'workerid');
+        $this->assertTrue($workID >= 0 && $workID <= 31);
+        $this->assertTrue($dataID >= 0 && $dataID <= 31);
+
+        $snowflake = new Snowflake();
+        $dataID = $this->invokeProperty($snowflake, 'datacenter');
+        $workID = $this->invokeProperty($snowflake, 'workerid');
+        $this->assertTrue($workID >= 0 && $workID <= 31);
+        $this->assertTrue($dataID >= 0 && $dataID <= 31);
     }
 
     public function testWorkIDAndDataCenterId()
@@ -220,5 +237,25 @@ class SnowflakeTest extends TestCase
         $this->expectExceptionMessage('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << 41), You can reset the start time to fix this');
 
         $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
+    }
+
+    public function testGenerateID() {
+        $snowflake = new Snowflake(1, 1);
+        $snowflake->setStartTimeStamp(1);
+        $snowflake->setSequenceResolver(function ($t) {
+            global $startTime;
+
+            if (!$startTime) {
+                $startTime = time();
+            }
+
+            // sleep 5 seconds
+            if (time() - $startTime <= 5) {
+                return 4096;
+            }
+            return 1;
+        });
+
+        $this->assertNotEmpty($snowflake->id());
     }
 }

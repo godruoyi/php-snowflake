@@ -23,6 +23,7 @@ class SonyflakeTest extends TestCase
 
         $snowflake = new Sonyflake(0);
         $this->assertInstanceOf(Sonyflake::class, $snowflake);
+        $this->assertEquals(0, $this->invokeProperty($snowflake, "machineid"));
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid machine ID, must be between 0 ~ 65535.');
@@ -30,6 +31,7 @@ class SonyflakeTest extends TestCase
 
         $snowflake = new Sonyflake(65535);
         $this->assertInstanceOf(Sonyflake::class, $snowflake);
+        $this->assertEquals(65535, $this->invokeProperty($snowflake, "machineid"));
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid machine ID, must be between 0 ~ 65535.');
@@ -43,10 +45,24 @@ class SonyflakeTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Exceeding the maximum life cycle of the algorithm');
         $snowflake->setStartTimeStamp(strtotime('1840-01-01 00:00:00') * 1000); // 2021 - 1840 = 181 > The lifetime (174 years)
+    }
+
+    public function testSetStartTimeStampCannotGreaterThanCurrentTime () {
+        $snowflake = new Sonyflake(110);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The start time cannot be greater than the current time');
         $snowflake->setStartTimeStamp(strtotime('2345-01-01 00:00:00') * 1000);
+
+        $snowflake->setStartTimeStamp(1);
+        $this->assertEquals(1, $snowflake->getStartTimeStamp());
+    }
+
+    public function testSetStartTimeStampBasic () {
+        $snowflake = new Sonyflake(110);
+
+        $snowflake->setStartTimeStamp(1);
+        $this->assertEquals(1, $snowflake->getStartTimeStamp());
     }
 
     public function testParseId()
@@ -80,6 +96,27 @@ class SonyflakeTest extends TestCase
             $datas[$id] = 1;
         }
         $this->assertTrue(100000 === count($datas));
+    }
+
+    public function testGenerateID() {
+        $snowflake = new Sonyflake(1);
+        $snowflake->setStartTimeStamp(1);
+
+        $snowflake->setSequenceResolver(function ($t) {
+            global $startTime;
+
+            if (!$startTime) {
+                $startTime = time();
+            }
+
+            // sleep 10 seconds
+            if (time() - $startTime <= 5) {
+                return 256;
+            }
+            return 1;
+        });
+
+        $this->assertNotEmpty($snowflake->id());
     }
 
     public function testGetDefaultSequenceResolver()

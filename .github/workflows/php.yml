@@ -86,6 +86,9 @@ jobs:
         if: matrix.dependencies == 'highest'
         run: composer update --no-ansi --no-interaction --no-progress
 
+      - name: Install Laravel Illuminate Contracts
+        run: composer require "illuminate/contracts"
+
       - name: Collect code coverage with phpunit
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
 

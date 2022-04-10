@@ -10,23 +10,23 @@
 
 namespace Tests;
 
+use Illuminate\Contracts\Cache\Repository;
 use Godruoyi\Snowflake\LaravelSequenceResolver;
 
-/**
- * @internal
- * @coversNothing
- */
 class LaravelSequenceResolverTest extends TestCase
 {
     public function testBasic()
     {
-        // $a = new LaravelSequenceResolver();
+        $mock = $this->createStub(Repository::class);
 
-        $this->assertTrue(true);
-    }
+        $mock->method('add')->withAnyParameters()->willReturn(true, false, true);
 
-    public function testSequence()
-    {
-        $this->assertTrue(true);
+        $mock->method('increment')->withAnyParameters()->willReturn(1);
+
+        $laravel = new LaravelSequenceResolver($mock);
+
+        $this->assertEquals(0, $laravel->sequence(1));
+        $this->assertEquals(1, $laravel->sequence(1));
+        $this->assertEquals(0, $laravel->sequence(1));
     }
 }

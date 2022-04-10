@@ -13,10 +13,6 @@ namespace Tests;
 use RedisException;
 use Godruoyi\Snowflake\RedisSequenceResolver;
 
-/**
- * @internal
- * @coversNothing
- */
 class RedisSequenceResolverTest extends TestCase
 {
     public function testInvalidRedisConnect() {

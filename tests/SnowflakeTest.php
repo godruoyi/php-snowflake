@@ -14,10 +14,6 @@ use Godruoyi\Snowflake\RandomSequenceResolver;
 use Godruoyi\Snowflake\SequenceResolver;
 use Godruoyi\Snowflake\Snowflake;
 
-/**
- * @internal
- * @coversNothing
- */
 class SnowflakeTest extends TestCase
 {
     public function testBasic()

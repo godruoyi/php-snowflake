@@ -12,10 +12,6 @@ namespace Tests;
 
 use Godruoyi\Snowflake\SwooleSequenceResolver;
 
-/**
- * @internal
- * @coversNothing
- */
 class SwooleSequenceResolverTest extends TestCase
 {
     public function testBasic()

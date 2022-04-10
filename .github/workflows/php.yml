@@ -11,14 +11,6 @@ on:
 jobs:
   phptests:
     runs-on: ${{ matrix.operating-system }}
-
-    services:
-      redis:
-        image: redis:5.0
-        ports:
-          - 6379:6379
-        options: --entrypoint redis-server
-
     strategy:
       matrix:
         operating-system: ['ubuntu-latest']
@@ -51,14 +43,6 @@ jobs:
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
-
-    services:
-      redis:
-        image: redis:5.0
-        ports:
-          - 6379:6379
-        options: --entrypoint redis-server
-
     strategy:
       fail-fast: false
       matrix:

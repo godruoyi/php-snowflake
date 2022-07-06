@@ -149,4 +149,13 @@ class IceFlakeTest extends TestCase
         $this->assertTrue(1 === $snowflake->getStartTimeStamp());
     }
 
+    public function testGetCurrentMicrotime()
+    {
+        $snowflake = new IceFlake(222);
+        $now = floor(microtime(true) * 1000) | 0;
+        $time = $snowflake->getCurrentMicrotime();
+
+        $this->assertTrue($now - $time >= 0);
+    }
+
 }

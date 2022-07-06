@@ -112,7 +112,7 @@ class IceFlake extends Snowflake
     }
 
     /**
-     * Get start timestamp, If not set default to 2022-02-06 17:55:08.
+     * Get start timestamp, If not set default to 2022-02-06 17:53:00.
      *
      * @return int
      */
@@ -123,7 +123,7 @@ class IceFlake extends Snowflake
         }
 
         // We set a default start time if you not set.
-        $defaultTime = '2022-02-06 17:55:08';
+        $defaultTime = '2022-02-06 17:53:00';
 
         return strtotime($defaultTime);
     }

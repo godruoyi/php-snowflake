@@ -141,7 +141,7 @@ class IceFlakeTest extends TestCase
     public function testGetStartTimeStamp()
     {
         $snowflake = new IceFlake(111);
-        $defaultTime = '2019-08-08 08:08:08';
+        $defaultTime = '2022-02-06 17:53:00';
 
         $this->assertTrue($snowflake->getStartTimeStamp() === (strtotime($defaultTime)));
 

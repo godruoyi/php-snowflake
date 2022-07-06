@@ -26,7 +26,7 @@ class IceFlake extends Snowflake
     protected $machineid;
 
     /**
-     * Build Sonyflake Instance.
+     * Build IceFlake Instance.
      *
      * @param int $machineid machine ID 0 ~ 511 (2^9)-1
      */
@@ -41,7 +41,7 @@ class IceFlake extends Snowflake
     }
 
     /**
-     * Get Sonyflake id.
+     * Get IceFlake id.
      *
      * @return string
      */

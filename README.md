@@ -1,23 +1,23 @@
 <div>
   <p align="center">
-    <image src="https://www.pngkey.com/png/full/105-1052235_snowflake-png-transparent-background-snowflake-with-clear-background.png" width="250" height="250">
+    <image src="https://www.pngkey.com/png/full/105-1052235_snowflake-png-transparent-background-snowflake-with-clear-background.png" width="250" height="250" />
   </p>
   <p align="center">An ID Generator for PHP based on Snowflake Algorithm (Twitter announced).</p>
   <p align="center">
     <a href="https://github.com/godruoyi/php-snowflake/actions/workflows/php.yml">
-      <image src="https://github.com/godruoyi/php-snowflake/actions/workflows/php.yml/badge.svg" alt="build passed">
+      <image src="https://github.com/godruoyi/php-snowflake/actions/workflows/php.yml/badge.svg" alt="build passed" />
     </a>
     <a href="https://codecov.io/gh/godruoyi/php-snowflake">
       <img src="https://codecov.io/gh/godruoyi/php-snowflake/branch/master/graph/badge.svg?token=7AAOYCJK97"/>
     </a>
     <a href="https://github.com/godruoyi/php-snowflake">
-      <image src="https://poser.pugx.org/godruoyi/php-snowflake/license" alt="License">
+      <image src="https://poser.pugx.org/godruoyi/php-snowflake/license" alt="License" />
     </a>
     <a href="https://packagist.org/packages/godruoyi/php-snowflake">
-      <image src="https://poser.pugx.org/godruoyi/php-snowflake/v/stable" alt="Packagist Version">
+      <image src="https://poser.pugx.org/godruoyi/php-snowflake/v/stable" alt="Packagist Version" />
     </a>
     <a href="https://github.com/godruoyi/php-snowflake">
-      <image src="https://poser.pugx.org/godruoyi/php-snowflake/downloads" alt="Total Downloads">
+      <image src="https://poser.pugx.org/godruoyi/php-snowflake/downloads" alt="Total Downloads" />
     </a>
   </p>
 </div>
@@ -48,7 +48,10 @@ Based on this, we created this package and integrated multiple sequence-number p
 * LaravelSequenceResolver (based on redis psetex and incrby)
 * SwooleSequenceResolver (based on swoole_lock)
 
-> Each provider only needs to ensure that the serial number generated in the same millisecond is different. You can get a unique ID.
+Each provider only needs to ensure that the serial number generated in the same millisecond is different. You can get a unique ID.
+
+> **Warning**
+> The RandomSequenceResolver does not guarantee that the generated IDs are unique, If you want to generate a unique ID, please use another resolver instead.
 
 ## Requirement
 

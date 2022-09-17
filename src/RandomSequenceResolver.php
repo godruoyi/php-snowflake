@@ -13,7 +13,7 @@ namespace Godruoyi\Snowflake;
 class RandomSequenceResolver implements SequenceResolver
 {
     /**
-     * The las ttimestamp.
+     * The last timestamp.
      *
      * @var null
      */
@@ -27,20 +27,35 @@ class RandomSequenceResolver implements SequenceResolver
     protected $sequence = 0;
 
     /**
+     * Max sequence number in one ms.
+     *
+     * @var int
+     */
+    protected $maxSequence = Snowflake::MAX_SEQUENCE_SIZE;
+
+    /**
      *  {@inheritdoc}
      */
     public function sequence(int $currentTime)
     {
         if ($this->lastTimeStamp === $currentTime) {
-            ++$this->sequence;
+            $this->sequence++;
             $this->lastTimeStamp = $currentTime;
 
             return $this->sequence;
         }
 
-        $this->sequence = 0;
+        $this->sequence = mt_rand(0, $this->maxSequence);
         $this->lastTimeStamp = $currentTime;
 
         return 0;
+    }
+
+    /**
+     * @param  int  $maxSequence
+     */
+    public function setMaxSequence(int $maxSequence): void
+    {
+        $this->maxSequence = $maxSequence;
     }
 }

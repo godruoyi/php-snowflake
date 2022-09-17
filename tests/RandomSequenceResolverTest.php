@@ -11,19 +11,31 @@
 namespace Tests;
 
 use Godruoyi\Snowflake\RandomSequenceResolver;
+use Godruoyi\Snowflake\Snowflake;
 
 class RandomSequenceResolverTest extends TestCase
 {
     public function testBasic()
     {
         $random = new RandomSequenceResolver();
+        $seqs = [];
 
-        $this->assertTrue(0 === $random->sequence(1));
-        $this->assertTrue(1 === $random->sequence(1));
-        $this->assertTrue(0 === $random->sequence(2));
-        $this->assertTrue(0 === $random->sequence(3));
-        $this->assertTrue(1 === $random->sequence(3));
-        $this->assertTrue(0 === $random->sequence(4));
-        $this->assertTrue(1 === $random->sequence(4));
+        for ($i = 0; $i < Snowflake::MAX_SEQUENCE_SIZE; $i++) {
+            $seqs[$random->sequence(0)] = true;
+        }
+
+        $this->assertCount(Snowflake::MAX_SEQUENCE_SIZE, $seqs);
+    }
+
+    public function testCanGenerateUniqueIdBySnowflake()
+    {
+        $snowflake = new Snowflake(1, 1);
+        $seqs = [];
+
+        for ($i = 0; $i < Snowflake::MAX_SEQUENCE_SIZE; $i++) {
+            $seqs[$snowflake->id()] = true;
+        }
+
+        $this->assertCount(Snowflake::MAX_SEQUENCE_SIZE, $seqs);
     }
 }

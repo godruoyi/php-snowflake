@@ -10,6 +10,8 @@
 
 namespace Godruoyi\Snowflake;
 
+use Exception;
+
 class Snowflake
 {
     public const MAX_TIMESTAMP_LENGTH = 41;
@@ -19,6 +21,8 @@ class Snowflake
     public const MAX_WORKID_LENGTH = 5;
 
     public const MAX_SEQUENCE_LENGTH = 12;
+
+    public const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
 
     public const MAX_FIRST_LENGTH = 1;
 
@@ -39,7 +43,7 @@ class Snowflake
     /**
      * The Sequence Resolver instance.
      *
-     * @var null|\Godruoyi\Snowflake\SequenceResolver
+     * @var null|SequenceResolver
      */
     protected $sequence;
 
@@ -53,15 +57,15 @@ class Snowflake
     /**
      * Default sequence resolver.
      *
-     * @var null|\Godruoyi\Snowflake\SequenceResolver
+     * @var null|SequenceResolver
      */
     protected $defaultSequenceResolver;
 
     /**
      * Build Snowflake Instance.
      *
-     * @param int $datacenter
-     * @param int $workerid
+     * @param  int|null  $datacenter
+     * @param  int|null  $workerid
      */
     public function __construct(int $datacenter = null, int $workerid = null)
     {
@@ -127,19 +131,21 @@ class Snowflake
 
     /**
      * Set start time (millisecond).
+     *
+     * @throws Exception
      */
     public function setStartTimeStamp(int $startTime)
     {
         $missTime = $this->getCurrentMicrotime() - $startTime;
 
         if ($missTime < 0) {
-            throw new \Exception('The start time cannot be greater than the current time');
+            throw new Exception('The start time cannot be greater than the current time');
         }
 
         $maxTimeDiff = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
 
         if ($missTime > $maxTimeDiff) {
-            throw new \Exception(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
+            throw new Exception(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
         }
 
         $this->startTime = $startTime;
@@ -167,7 +173,7 @@ class Snowflake
     /**
      * Set Sequence Resolver.
      *
-     * @param callable|SequenceResolver $sequence
+     * @param  callable|SequenceResolver  $sequence
      */
     public function setSequenceResolver($sequence)
     {
@@ -179,7 +185,7 @@ class Snowflake
     /**
      * Get Sequence Resolver.
      *
-     * @return null|callable|\Godruoyi\Snowflake\SequenceResolver
+     * @return SequenceResolver|null
      */
     public function getSequenceResolver()
     {
@@ -189,7 +195,7 @@ class Snowflake
     /**
      * Get Default Sequence Resolver.
      *
-     * @return \Godruoyi\Snowflake\SequenceResolver
+     * @return SequenceResolver
      */
     public function getDefaultSequenceResolver(): SequenceResolver
     {
@@ -199,10 +205,7 @@ class Snowflake
     /**
      * Call resolver.
      *
-     * @param callable|\Godruoyi\Snowflake\SequenceResolver $resolver
-     * @param int                                           $maxSequence
-     * @param mixed                                         $currentTime
-     *
+     * @param  mixed  $currentTime
      * @return int
      */
     protected function callResolver($currentTime)
@@ -213,7 +216,7 @@ class Snowflake
             return $resolver($currentTime);
         }
 
-        return is_null($resolver) || !($resolver instanceof SequenceResolver)
+        return ! ($resolver instanceof SequenceResolver)
             ? $this->getDefaultSequenceResolver()->sequence($currentTime)
             : $resolver->sequence($currentTime);
     }

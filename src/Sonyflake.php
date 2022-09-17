@@ -10,6 +10,8 @@
 
 namespace Godruoyi\Snowflake;
 
+use Exception;
+
 class Sonyflake extends Snowflake
 {
     const MAX_TIMESTAMP_LENGTH = 39;
@@ -17,6 +19,8 @@ class Sonyflake extends Snowflake
     const MAX_MACHINEID_LENGTH = 16;
 
     const MAX_SEQUENCE_LENGTH = 8;
+
+    public const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
 
     /**
      * The machine ID.
@@ -28,7 +32,7 @@ class Sonyflake extends Snowflake
     /**
      * Build Sonyflake Instance.
      *
-     * @param int $machineid machine ID 0 ~ 65535 (2^16)-1
+     * @param  int  $machineid machine ID 0 ~ 65535 (2^16)-1
      */
     public function __construct(int $machineid = 0)
     {
@@ -44,6 +48,8 @@ class Sonyflake extends Snowflake
      * Get Sonyflake id.
      *
      * @return string
+     *
+     * @throws Exception
      */
     public function id()
     {
@@ -64,7 +70,7 @@ class Sonyflake extends Snowflake
 
         if ($elapsedTime > (-1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH))) {
             // The lifetime (174 years).
-            throw new \Exception('Exceeding the maximum life cycle of the algorithm.');
+            throw new Exception('Exceeding the maximum life cycle of the algorithm.');
         }
 
         return (string) ($elapsedTime << $timestampLeftMoveLength
@@ -79,12 +85,12 @@ class Sonyflake extends Snowflake
     {
         $elapsedTime = floor(($this->getCurrentMicrotime() - $startTime) / 10) | 0;
         if ($elapsedTime < 0) {
-            throw new \Exception('The start time cannot be greater than the current time');
+            throw new Exception('The start time cannot be greater than the current time');
         }
 
         $maxTimeDiff = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
         if ($elapsedTime > $maxTimeDiff) {
-            throw new \Exception('Exceeding the maximum life cycle of the algorithm');
+            throw new Exception('Exceeding the maximum life cycle of the algorithm');
         }
 
         $this->startTime = $startTime;
@@ -109,6 +115,21 @@ class Sonyflake extends Snowflake
         return $transform ? array_map(function ($value) {
             return bindec($value);
         }, $data) : $data;
+    }
+
+    /**
+     * Get current timestamp.
+     */
+    public function getDefaultSequenceResolver(): SequenceResolver
+    {
+        if ($this->defaultSequenceResolver) {
+            return $this->defaultSequenceResolver;
+        }
+
+        $resolver = new RandomSequenceResolver();
+        $resolver->setMaxSequence(self::MAX_SEQUENCE_SIZE);
+
+        return $this->defaultSequenceResolver = $resolver;
     }
 
     /**

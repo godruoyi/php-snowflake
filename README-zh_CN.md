@@ -1,23 +1,23 @@
 <div>
   <p align="center">
-    <image src="https://www.pngkey.com/png/full/105-1052235_snowflake-png-transparent-background-snowflake-with-clear-background.png" width="250" height="250">
+    <image src="https://www.pngkey.com/png/full/105-1052235_snowflake-png-transparent-background-snowflake-with-clear-background.png" width="250" height="250"></image>
   </p>
   <p align="center">An ID Generator for PHP based on Snowflake Algorithm (Twitter announced).</p>
   <p align="center">
     <a href="https://github.com/godruoyi/php-snowflake/actions/workflows/php.yml">
-      <image src="https://github.com/godruoyi/php-snowflake/actions/workflows/php.yml/badge.svg" alt="build passed">
+      <image src="https://github.com/godruoyi/php-snowflake/actions/workflows/php.yml/badge.svg" alt="build passed"></image>
     </a>
     <a href="https://codecov.io/gh/godruoyi/php-snowflake">
       <img src="https://codecov.io/gh/godruoyi/php-snowflake/branch/master/graph/badge.svg?token=7AAOYCJK97"/>
     </a>
     <a href="https://github.com/godruoyi/php-snowflake">
-      <image src="https://poser.pugx.org/godruoyi/php-snowflake/license" alt="License">
+      <image src="https://poser.pugx.org/godruoyi/php-snowflake/license" alt="License"></image>
     </a>
     <a href="https://packagist.org/packages/godruoyi/php-snowflake">
-      <image src="https://poser.pugx.org/godruoyi/php-snowflake/v/stable" alt="Packagist Version">
+      <image src="https://poser.pugx.org/godruoyi/php-snowflake/v/stable" alt="Packagist Version"></image>
     </a>
     <a href="https://github.com/godruoyi/php-snowflake">
-      <image src="https://poser.pugx.org/godruoyi/php-snowflake/downloads" alt="Total Downloads">
+      <image src="https://poser.pugx.org/godruoyi/php-snowflake/downloads" alt="Total Downloads"></image>
     </a>
   </p>
 </div>
@@ -49,7 +49,8 @@ Snowflake 是 Twitter 内部的一个 ID 生算法，可以通过一些简单的
 * LaravelSequenceResolver（基于 redis psetex 和 incrby 生成）
 * SwooleSequenceResolver（基于 swoole_lock 锁）
 
-不同的提供者只需要保证**同一毫秒生成的序列号不同**，就能得到唯一的 ID。
+> **Warning**
+> RandomSequenceResolver 序列号提供者在高并发情况下可能会导致生成的 ID 重复，如果你的应用场景中可能会出现高并发的情况，建议使用 RedisSequenceResolver 或者 LaravelSequenceResolver。
 
 ## 要求
 
@@ -111,14 +112,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('snowflake', function () {
+        $this->app->singleton('snowflake', function ($app) {
             return (new Snowflake())
-                ->setStartTimeStamp(strtotime('2019-08-08')*1000)
-                ->setSequenceResolver(
-                    new LaravelSequenceResolver($this->app->get('cache')->store()
-                ));
+                ->setStartTimeStamp(strtotime('2019-10-10')*1000)
+                ->setSequenceResolver(new LaravelSequenceResolver($app->get('cache.store')));
         });
     }
+}
 }
 ```
 

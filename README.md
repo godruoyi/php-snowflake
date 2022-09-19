@@ -113,10 +113,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('snowflake', function () {
+        $this->app->singleton('snowflake', function ($app) {
             return (new Snowflake())
                 ->setStartTimeStamp(strtotime('2019-10-10')*1000)
-                ->setSequenceResolver(new LaravelSequenceResolver($this->app->get('cache')->store()));
+                ->setSequenceResolver(new LaravelSequenceResolver($app->get('cache.store')));
         });
     }
 }

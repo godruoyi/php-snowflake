@@ -61,7 +61,7 @@ LUA;
     }
 
     /**
-     * Set cacge prefix.
+     * Set cache prefix.
      */
     public function setCachePrefix(string $prefix)
     {

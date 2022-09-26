@@ -17,7 +17,7 @@ class LaravelSequenceResolver implements SequenceResolver
     /**
      * The laravel cache instance.
      *
-     * @var \Illuminate\Contracts\Cache\Repository
+     * @var Repository
      */
     protected $cache;
 

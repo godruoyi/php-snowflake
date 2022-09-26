@@ -18,7 +18,7 @@ class RedisSequenceResolver implements SequenceResolver
     /**
      * The redis client instance.
      *
-     * @var \Redis
+     * @var Redis
      */
     protected $redis;
 
@@ -61,7 +61,7 @@ LUA;
     }
 
     /**
-     * Set cacge prefix.
+     * Set cache prefix.
      */
     public function setCachePrefix(string $prefix)
     {

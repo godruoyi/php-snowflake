@@ -10,6 +10,7 @@
 
 namespace Tests;
 
+use Closure;
 use Godruoyi\Snowflake\RandomSequenceResolver;
 use Godruoyi\Snowflake\SequenceResolver;
 use Godruoyi\Snowflake\Snowflake;
@@ -20,11 +21,12 @@ class SnowflakeTest extends TestCase
     {
         $snowflake = new Snowflake();
 
-        $this->assertTrue(!empty($snowflake->id()));
+        $this->assertTrue(! empty($snowflake->id()));
         $this->assertTrue(strlen($snowflake->id()) <= 19);
     }
 
-    public function testInvalidDatacenterIDAndWorkID() {
+    public function testInvalidDatacenterIDAndWorkID()
+    {
         $snowflake = new Snowflake(-1, -1);
 
         $dataID = $this->invokeProperty($snowflake, 'datacenter');
@@ -49,17 +51,17 @@ class SnowflakeTest extends TestCase
     {
         $snowflake = new Snowflake(-1, -1);
 
-        $this->assertTrue(!empty($snowflake->id()));
+        $this->assertTrue(! empty($snowflake->id()));
         $this->assertTrue(strlen($snowflake->id()) <= 19);
 
         $snowflake = new Snowflake(33, -1);
 
-        $this->assertTrue(!empty($snowflake->id()));
+        $this->assertTrue(! empty($snowflake->id()));
         $this->assertTrue(strlen($snowflake->id()) <= 19);
 
         $snowflake = new Snowflake(1, 2);
 
-        $this->assertTrue(!empty($snowflake->id()));
+        $this->assertTrue(! empty($snowflake->id()));
         $this->assertTrue(strlen($id = $snowflake->id()) <= 19);
 
         $this->assertTrue(1 === $snowflake->parseId($id, true)['datacenter']);
@@ -94,7 +96,7 @@ class SnowflakeTest extends TestCase
             static $sequence;
 
             if ($lastTime === $currentTime) {
-                ++$sequence;
+                $sequence++;
             } else {
                 $sequence = 0;
             }
@@ -106,7 +108,7 @@ class SnowflakeTest extends TestCase
 
         $datas = [];
 
-        for ($i = 0; $i < 10000; ++$i) {
+        for ($i = 0; $i < 10000; $i++) {
             $id = $snowflake->id();
 
             $datas[$id] = 1;
@@ -199,9 +201,10 @@ class SnowflakeTest extends TestCase
             return 999;
         });
 
+        /** @var Closure $seq */
         $seq = $snowflake->getSequenceResolver();
 
-        $this->assertTrue($seq instanceof \Closure);
+        $this->assertTrue($seq instanceof Closure);
         $this->assertTrue(999 === $seq(0));
     }
 
@@ -239,13 +242,14 @@ class SnowflakeTest extends TestCase
         $snowflake->setStartTimeStamp(strtotime('1900-01-01') * 1000);
     }
 
-    public function testGenerateID() {
+    public function testGenerateID()
+    {
         $snowflake = new Snowflake(1, 1);
         $snowflake->setStartTimeStamp(1);
         $snowflake->setSequenceResolver(function ($t) {
             global $startTime;
 
-            if (!$startTime) {
+            if (! $startTime) {
                 $startTime = time();
             }
 
@@ -253,6 +257,7 @@ class SnowflakeTest extends TestCase
             if (time() - $startTime <= 5) {
                 return 4096;
             }
+
             return 1;
         });
 

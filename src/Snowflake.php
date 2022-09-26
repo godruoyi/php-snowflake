@@ -134,9 +134,9 @@ class Snowflake
      *
      * @throws Exception
      */
-    public function setStartTimeStamp(int $startTime)
+    public function setStartTimeStamp(int $millisecond)
     {
-        $missTime = $this->getCurrentMicrotime() - $startTime;
+        $missTime = $this->getCurrentMicrotime() - $millisecond;
 
         if ($missTime < 0) {
             throw new Exception('The start time cannot be greater than the current time');
@@ -148,7 +148,7 @@ class Snowflake
             throw new Exception(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
         }
 
-        $this->startTime = $startTime;
+        $this->startTime = $millisecond;
 
         return $this;
     }
@@ -160,7 +160,7 @@ class Snowflake
      */
     public function getStartTimeStamp()
     {
-        if ($this->startTime > 0) {
+        if (! is_null($this->startTime)) {
             return $this->startTime;
         }
 

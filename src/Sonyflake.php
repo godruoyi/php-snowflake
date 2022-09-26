@@ -56,44 +56,36 @@ class Sonyflake extends Snowflake
         $elapsedTime = $this->elapsedTime();
 
         while (($sequence = $this->callResolver($elapsedTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
-            $elapsedTime2 = $this->elapsedTime();
-            // Get next timestamp
-            while ($elapsedTime2 == $elapsedTime) {
+            $nextMillisecond = $this->elapsedTime();
+            while ($nextMillisecond == $elapsedTime) {
                 usleep(1);
-                $elapsedTime2 = $this->elapsedTime();
+                $nextMillisecond = $this->elapsedTime();
             }
-            $elapsedTime = $elapsedTime2;
+            $elapsedTime = $nextMillisecond;
         }
 
-        $machineidLeftMoveLength = self::MAX_SEQUENCE_LENGTH;
-        $timestampLeftMoveLength = self::MAX_MACHINEID_LENGTH + $machineidLeftMoveLength;
+        $this->ensureEffectiveRuntime($elapsedTime);
 
-        if ($elapsedTime > (-1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH))) {
-            // The lifetime (174 years).
-            throw new Exception('Exceeding the maximum life cycle of the algorithm.');
-        }
-
-        return (string) ($elapsedTime << $timestampLeftMoveLength
-            | ($this->machineid << $machineidLeftMoveLength)
+        return (string) ($elapsedTime << (self::MAX_MACHINEID_LENGTH + self::MAX_SEQUENCE_LENGTH)
+            | ($this->machineid << self::MAX_SEQUENCE_LENGTH)
             | ($sequence));
     }
 
     /**
      * Set start time (millisecond).
+     *
+     * @throws Exception
      */
-    public function setStartTimeStamp(int $startTime)
+    public function setStartTimeStamp(int $millisecond)
     {
-        $elapsedTime = floor(($this->getCurrentMicrotime() - $startTime) / 10) | 0;
+        $elapsedTime = floor(($this->getCurrentMicrotime() - $millisecond) / 10) | 0;
         if ($elapsedTime < 0) {
             throw new Exception('The start time cannot be greater than the current time');
         }
 
-        $maxTimeDiff = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
-        if ($elapsedTime > $maxTimeDiff) {
-            throw new Exception('Exceeding the maximum life cycle of the algorithm');
-        }
+        $this->ensureEffectiveRuntime($elapsedTime);
 
-        $this->startTime = $startTime;
+        $this->startTime = $millisecond;
 
         return $this;
     }
@@ -133,12 +125,28 @@ class Sonyflake extends Snowflake
     }
 
     /**
-     * The Elapsed Time.
+     * The Elapsed Time, unit: 10millisecond.
      *
      * @return int
      */
-    private function elapsedTime()
+    private function elapsedTime(): int
     {
         return floor(($this->getCurrentMicrotime() - $this->getStartTimeStamp()) / 10) | 0;
+    }
+
+    /**
+     * Make sure it's an effective runtime
+     *
+     * @param  int  $elapsedTime unit: 10millisecond
+     * @return void
+     *
+     * @throws Exception
+     */
+    private function ensureEffectiveRuntime(int $elapsedTime): void
+    {
+        $maxRunTime = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
+        if ($elapsedTime > $maxRunTime) {
+            throw new Exception('Exceeding the maximum life cycle of the algorithm');
+        }
     }
 }

@@ -48,7 +48,7 @@ class RandomSequenceResolver implements SequenceResolver
         $this->sequence = mt_rand(0, $this->maxSequence);
         $this->lastTimeStamp = $currentTime;
 
-        return 0;
+        return $this->sequence;
     }
 
     /**

@@ -20,7 +20,7 @@ class DiffWorkIdBatchTest extends TestCase
 
         $ids = [];
 
-        for ($i = 0; $i < 10000; ++$i) {
+        for ($i = 0; $i < 10000; $i++) {
             $id = $snowflake->id();
 
             $ids[$id] = 1;
@@ -28,7 +28,7 @@ class DiffWorkIdBatchTest extends TestCase
 
         $snowflake = new Snowflake(1, 2);
 
-        for ($j = 0; $j < 10000; ++$j) {
+        for ($j = 0; $j < 10000; $j++) {
             $id = $snowflake->id();
 
             $ids[$id] = 1;

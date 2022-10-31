@@ -139,7 +139,7 @@ class SnowflakeTest extends TestCase
 
         $this->assertTrue(2 === $payloads['datacenter']);
         $this->assertTrue(3 === $payloads['workerid']);
-        $this->assertTrue(0 === $payloads['sequence']);
+        $this->assertLessThan(Snowflake::MAX_SEQUENCE_SIZE, $payloads['sequence']);
 
         $payloads = $snowflake->parseId('0');
         $this->assertTrue('' == $payloads['timestamp'] || false == $payloads['timestamp']);

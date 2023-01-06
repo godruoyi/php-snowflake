@@ -27,8 +27,9 @@ class SwooleSequenceResolverTest extends TestCase
         $this->assertTrue(1 == $snowflake->sequence(1));
         $this->assertTrue(2 == $snowflake->sequence(1));
     }
-    public function testResetLock() {
 
+    public function testResetLock()
+    {
         $snowflake = new SwooleSequenceResolver();
 
         $lock = $this->createStub(\Swoole\Lock::class);

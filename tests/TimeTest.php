@@ -25,7 +25,7 @@ class TimeTest extends TestCase
                 usleep(1);
                 $s2 = $s->getcurrentMicrotime();
             }
-            ++$a;
+            $a++;
             $this->assertTrue($s1 != $s2);
         }
     }

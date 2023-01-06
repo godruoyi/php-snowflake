@@ -10,12 +10,13 @@
 
 namespace Tests;
 
-use RedisException;
 use Godruoyi\Snowflake\RedisSequenceResolver;
+use RedisException;
 
 class RedisSequenceResolverTest extends TestCase
 {
-    public function testInvalidRedisConnect() {
+    public function testInvalidRedisConnect()
+    {
         $redis = $this->createMock(\Redis::class);
         $redis->expects($this->once())->method('ping')->willReturn(false);
 
@@ -46,6 +47,6 @@ class RedisSequenceResolverTest extends TestCase
         $snowflake = new RedisSequenceResolver($redis);
         $snowflake->setCachePrefix('foo');
 
-       $this->assertEquals('foo', $this->invokeProperty($snowflake, 'prefix'));
+        $this->assertEquals('foo', $this->invokeProperty($snowflake, 'prefix'));
     }
 }

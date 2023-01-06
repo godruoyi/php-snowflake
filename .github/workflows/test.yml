@@ -1,13 +1,6 @@
-name: php
+name: test
 on:
   pull_request:
-    branches:
-      - master
-      - dev
-  push:
-    branches:
-      - master
-      - dev
 jobs:
   phptests:
     runs-on: ${{ matrix.operating-system }}
@@ -30,7 +23,7 @@ jobs:
     - name: Install dependencies
       uses: nick-invision/retry@v1
       with:
-        timeout_minutes: 5
+        timeout_minutes: 10
         max_attempts: 5
         command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 

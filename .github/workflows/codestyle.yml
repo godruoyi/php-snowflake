@@ -1,0 +1,44 @@
+name: codestyle
+on:
+  pull_request:
+jobs:
+  code-coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - 8.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: pcov
+          tools: composer:v2
+          extensions: swoole, redis
+
+      - name: Install dependencies with composer
+        run: composer update --no-ansi --no-interaction --no-progress
+
+      - name: Install Laravel Illuminate Contracts
+        run: composer require "illuminate/contracts"
+
+      - name: Install Laravel pint
+        run: composer require "laravel/pint"
+
+      - name: Code Style
+        run: vendor/bin/pint --test
+
+      - name: Collect code coverage with phpunit
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: Send code coverage report to Codecov.io
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml

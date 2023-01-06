@@ -10,8 +10,8 @@
 
 namespace Tests;
 
-use Illuminate\Contracts\Cache\Repository;
 use Godruoyi\Snowflake\LaravelSequenceResolver;
+use Illuminate\Contracts\Cache\Repository;
 
 class LaravelSequenceResolverTest extends TestCase
 {

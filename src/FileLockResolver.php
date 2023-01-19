@@ -1,17 +1,40 @@
 <?php
 
+/*
+ * This file is part of the godruoyi/php-snowflake.
+ *
+ * (c) Godruoyi <g@godruoyi.com>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
+
 namespace Godruoyi\Snowflake;
 
-use Closure;
 use Exception;
 
 class FileLockResolver implements SequenceResolver
 {
-    public const SHARD_COUNT = 1;
+    /**
+     * We should always use exclusive lock to avoid the problem of concurrent access.
+     */
+    public const FlockLockOperation = LOCK_EX;
 
-    public static $openMode = 'a+';
+    public const FileOpenMode = 'r+';
 
-    public static $lockOperation = LOCK_SH;
+    /**
+     * For each lock file, we save 6,000 items, It can contain data generated within 10 minutes,
+     * we believe is sufficient for the snowflake algorithm.
+     *
+     * 10m = 600s = 6000 ms
+     *
+     * @var int
+     */
+    public static $maxItems = 6000;
+
+    /**
+     * @var int
+     */
+    public static $shardCount = 32;
 
     /**
      * @var string
@@ -19,45 +42,184 @@ class FileLockResolver implements SequenceResolver
     protected $lockFileDir;
 
     /**
-     * @var resource[]
-     */
-    protected $shardLockMap = [];
-
-    /**
+     * @param  string|null  $lockFileDir
+     *
      * @throws Exception
      */
     public function __construct(string $lockFileDir = null)
     {
         $this->lockFileDir = $this->preparePath($lockFileDir);
-
-        $this->createShardLockFiles();
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws Exception when can not open lock file.
+     * @throws Exception when can not open lock file
      */
     public function sequence(int $currentTime)
     {
-        $filePath = $this->getShardLockFile($currentTime);
-        [$writer, $locked] = $this->locker($filePath);
+        $filePath = $this->createShardLockFile($this->getShardLockIndex($currentTime));
 
-        // lock failed, use microtime to generate sequence.
-        if ($locked === false) {
-            return Snowflake::MAX_SEQUENCE_SIZE + 1;
+        return $this->getSequence($filePath, $currentTime);
+    }
+
+    /**
+     * Get next sequence. move lock/unlock in the same method to avoid lock file not release, this
+     * will be more friendly to test.
+     *
+     * @param  string  $filePath
+     * @param  int  $currentTime
+     * @return int
+     *
+     * @throws Exception
+     */
+    protected function getSequence(string $filePath, int $currentTime): int
+    {
+        $f = null;
+
+        if (! file_exists($filePath)) {
+            throw new Exception(sprintf('the lock file %s not exists', $filePath));
         }
 
-        return $writer($currentTime);
+        try {
+            $f = fopen($filePath, static::FileOpenMode);
+
+            // we always use exclusive lock to avoid the problem of concurrent access.
+            // so we don't need to check the return value of flock.
+            flock($f, static::FlockLockOperation);
+        } catch (\Throwable $e) {
+            $this->unlock($f);
+
+            throw new Exception(sprintf('can not open/lock this file %s', $filePath), $e->getCode(), $e);
+        }
+
+        // We may get this error if the file contains invalid json, when you get this error,
+        // may you can try to delete the invalid lock file directly.
+        if (is_null($contents = $this->getContents($f))) {
+            $this->unlock($f);
+
+            throw new Exception(sprintf('file %s is not a valid lock file.', $filePath));
+        }
+
+        $this->updateContents($contents = $this->incrementSequenceWithSpecifyTime(
+            $this->cleanOldSequences($contents), $currentTime
+        ), $f);
+
+        $this->unlock($f);
+
+        return $contents[$currentTime];
+    }
+
+    /**
+     * Unlock and close file.
+     *
+     * @param $f
+     * @return void
+     */
+    protected function unlock($f)
+    {
+        if (is_resource($f)) {
+            flock($f, LOCK_UN);
+            fclose($f);
+        }
+    }
+
+    /**
+     * @param  array  $contents
+     * @param $f
+     * @return bool
+     */
+    public function updateContents(array $contents, $f): bool
+    {
+        return ftruncate($f, 0) && rewind($f)
+            && (fwrite($f, serialize($contents)) !== false);
+    }
+
+    /**
+     * Increment sequence with specify time. if current time is not set in the lock file
+     * set it to 1, otherwise increment it.
+     *
+     * @param  array  $contents
+     * @param  int  $currentTime
+     * @return array
+     */
+    public function incrementSequenceWithSpecifyTime(array $contents, int $currentTime): array
+    {
+        $contents[$currentTime] = isset($contents[$currentTime]) ? $contents[$currentTime] + 1 : 1;
+
+        return $contents;
+    }
+
+    /**
+     * Clean the old content, we only save the data generated within 10 minutes.
+     *
+     * @param  array  $contents
+     * @return array
+     */
+    public function cleanOldSequences(array $contents): array
+    {
+        ksort($contents); // sort by timestamp
+
+        if (count($contents) > static::$maxItems) {
+            $contents = array_slice($contents, -static::$maxItems, null, true);
+        }
+
+        return $contents;
+    }
+
+    /**
+     * Remove all lock files, we only delete the file that name is match the pattern.
+     *
+     * @return void
+     */
+    public function cleanAllLocksFile()
+    {
+        $files = glob($this->lockFileDir.'/*');
+
+        foreach ($files as $file) {
+            if (is_file($file) && preg_match('/snowflake-(\d+)\.lock$/', $file)) {
+                unlink($file);
+            }
+        }
+    }
+
+    /**
+     * Get resource contents, If the contents are invalid json, return null.
+     *
+     * @param $f resource
+     * @return array|null
+     */
+    public function getContents($f): ?array
+    {
+        $content = '';
+
+        while (! feof($f)) {
+            $content .= fread($f, 1024);
+        }
+
+        $content = trim($content);
+
+        if (empty($content)) {
+            return [];
+        }
+
+        try {
+            if (is_array($data = unserialize($content))) {
+                return $data;
+            }
+        } catch (\Throwable $e) {
+        }
+
+        return null;
     }
 
     /**
      * @see https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
      *
      * @param  string  $str
-     * @return int
+     * @return float
      */
-    public function fnv(string $str): int
+    public function fnv(string $str): float
     {
         $hash = 2166136261;
 
@@ -70,102 +232,14 @@ class FileLockResolver implements SequenceResolver
     }
 
     /**
-     * Shard lock file path.
+     * Shard lock file index.
      *
      * @param  int  $currentTime
-     * @return string
+     * @return int
      */
-    public function getShardLockFile(int $currentTime): string
+    public function getShardLockIndex(int $currentTime): int
     {
-        $index = $this->fnv($currentTime) % self::SHARD_COUNT;
-
-        return $this->shardLockMap[$index];
-    }
-
-    /**
-     * Delete all lock files.
-     *
-     * @return void
-     */
-    public function cleanAllLocks()
-    {
-        $files = glob(sprintf('%s/*.lock', $this->lockFileDir));
-
-        foreach ($files as $file) {
-            unlink($file);
-        }
-    }
-
-    /**
-     * @param  string  $file
-     * @return array
-     *
-     * @throws Exception
-     */
-    protected function locker(string $file): array
-    {
-        $f = null;
-
-        try {
-            if (! file_exists($file)) {
-                throw new Exception(sprintf('File %s is not exists.', $file));
-            }
-
-            $f = fopen($file, static::$openMode);
-            if ($f === false || ! flock($f, static::$lockOperation)) {
-                return [null, null, false];
-            }
-
-            return [$this->calculateSequence($f, $file), true];
-        } catch (Exception $e) {
-            $this->closeAndUnLock($f);
-
-            throw new Exception('Can not open lock file: '.$file, $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * Clean up the lock file.
-     *
-     * @param $f
-     * @return void
-     */
-    protected function closeAndUnLock($f): void
-    {
-        if ($f && is_resource($f)) {
-            flock($f, LOCK_UN);
-            fclose($f);
-        }
-    }
-
-    /**
-     * Calculate sequence.
-     *
-     * @param  resource  $f
-     * @param $path
-     * @return Closure
-     */
-    protected function calculateSequence($f, $path): Closure
-    {
-        return function (int $k) use ($f, $path) {
-            $content = file_get_contents($path);
-            $data = [];
-
-            if ($content) {
-                $data = json_decode($content, true);
-            }
-
-            if (isset($data[$k])) {
-                $data[$k] += 1;
-            } else {
-                $data[$k] = 1;
-            }
-
-            file_put_contents($path, json_encode($data));
-            $this->closeAndUnLock($f);
-
-            return $data[$k];
-        };
+        return $this->fnv($currentTime) % self::$shardCount;
     }
 
     /**
@@ -191,26 +265,32 @@ class FileLockResolver implements SequenceResolver
     }
 
     /**
-     * Generate shard lock files.
+     * Generate shard lock file.
      *
-     * @return void
+     * @param  int  $index
+     * @return string
      */
-    protected function createShardLockFiles()
+    protected function createShardLockFile(int $index): string
     {
-        $lockFile = '';
+        $path = $this->filePath($index);
 
-        for ($i = 0; $i < self::SHARD_COUNT; $i++) {
-            $lockFile = sprintf('%s%ssnowflake-%s.lock', rtrim($this->lockFileDir, DIRECTORY_SEPARATOR), DIRECTORY_SEPARATOR, $i);
-            if (! file_exists($lockFile)) {
-                touch($lockFile);
-            }
-
-            $this->shardLockMap[$i] = $lockFile;
+        if (file_exists($path)) {
+            return $path;
         }
 
-        // Wait for all lock files to be created
-        while (stat($lockFile) === false) {
-            usleep(1000);
-        }
+        touch($path);
+
+        return $path;
+    }
+
+    /**
+     * Format lock file path with shard index.
+     *
+     * @param  int  $index
+     * @return string
+     */
+    protected function filePath(int $index): string
+    {
+        return sprintf('%s%ssnowflake-%s.lock', rtrim($this->lockFileDir, DIRECTORY_SEPARATOR), DIRECTORY_SEPARATOR, $index);
     }
 }

@@ -225,7 +225,8 @@ class FileLockResolver implements SequenceResolver
 
         for ($i = 0; $i < strlen($str); $i++) {
             $hash ^= ord($str[$i]);
-            $hash *= 16777619;
+            $hash *= 0x01000193;
+            $hash &= 0xFFFFFFFF;
         }
 
         return $hash;

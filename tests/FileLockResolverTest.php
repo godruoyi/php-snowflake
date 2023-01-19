@@ -216,8 +216,8 @@ class FileLockResolverTest extends TestCase
     public function test_fnv()
     {
         $resolver = new FileLockResolver;
-        $a = $resolver->fnv('1');
-        $b = $resolver->fnv(1);
+        $a = $resolver->fnv('1674128900558');
+        $b = $resolver->fnv(1674128900558);
 
         $this->assertEquals($a, $b);
     }

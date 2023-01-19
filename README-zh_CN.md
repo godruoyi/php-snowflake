@@ -48,7 +48,7 @@ Snowflake 是 Twitter 内部的一个 ID 生算法，可以通过一些简单的
 * RedisSequenceResolver （基于 redis psetex 和 incrby 生成）
 * LaravelSequenceResolver（基于 redis psetex 和 incrby 生成）
 * SwooleSequenceResolver（基于 swoole_lock 锁）
-* FileLockResolver（基于 swoole_lock 锁）
+* FileLockResolver（基于 PHP 文件锁）
 
 > **Warning**
 > RandomSequenceResolver 序列号提供者在高并发情况下可能会导致生成的 ID 重复，如果你的应用场景中可能会出现高并发的情况，建议使用 RedisSequenceResolver 或者 LaravelSequenceResolver。

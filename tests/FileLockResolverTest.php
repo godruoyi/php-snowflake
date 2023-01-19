@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of the godruoyi/php-snowflake.
+ *
+ * (c) Godruoyi <g@godruoyi.com>
+ *
+ * This source file is subject to the MIT license that is bundled.
+ */
+
 namespace Tests;
 
 use Godruoyi\Snowflake\FileLockResolver;
@@ -247,7 +255,7 @@ class FileLockResolverTest extends TestCase
         $index = 1;
 
         $path = $this->invokeMethod($resolver, 'filePath', [$index]);
-        $this->assertFileDoesNotExist($path);
+        $this->assertTrue(! file_exists($path));
 
         touch($path);
 
@@ -264,7 +272,7 @@ class FileLockResolverTest extends TestCase
         $index = 1;
 
         $path = $this->invokeMethod($resolver, 'filePath', [$index]);
-        $this->assertFileDoesNotExist($path);
+        $this->assertTrue(! file_exists($path));
     }
 
     public function test_sequence()

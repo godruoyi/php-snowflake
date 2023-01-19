@@ -47,6 +47,7 @@ Based on this, we created this package and integrated multiple sequence-number p
 * RedisSequenceResolver (based on redis psetex and incrby)
 * LaravelSequenceResolver (based on redis psetex and incrby)
 * SwooleSequenceResolver (based on swoole_lock)
+* FileLockResolver（PHP file lock `fopen/flock`）
 
 Each provider only needs to ensure that the serial number generated in the same millisecond is different. You can get a unique ID.
 

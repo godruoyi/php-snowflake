@@ -1,3 +1,7 @@
 {
-
+    "rules": {
+        "header_comment": {
+            "header": "This file is part of the godruoyi/php-snowflake.\n \n(c) Godruoyi <g@godruoyi.com> \n \nThis source file is subject to the MIT license that is bundled."
+        }
+    }
 }

@@ -17,8 +17,7 @@
         "email": "g@godruoyi.com"
     }],
     "require": {
-        "php": ">=7.2",
-        "ext-json": "*"
+        "php": ">=7.2"
     },
     "require-dev": {
         "phpunit/phpunit": "~7|^8|^9"

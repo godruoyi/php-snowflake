@@ -101,7 +101,7 @@ class Sonyflake extends Snowflake
         $data = [
             'sequence' => substr($id, -1 * self::MAX_SEQUENCE_LENGTH),
             'machineid' => substr($id, -1 * $length, self::MAX_MACHINEID_LENGTH),
-            'timestamp' => substr($id, 0, $length),
+            'timestamp' => substr($id, 0, strlen($id) - $length),
         ];
 
         return $transform ? array_map(function ($value) {

@@ -20,7 +20,7 @@ class Sonyflake extends Snowflake
 
     const MAX_SEQUENCE_LENGTH = 8;
 
-    public const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
+    const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
 
     /**
      * The machine ID.
@@ -142,7 +142,7 @@ class Sonyflake extends Snowflake
      *
      * @throws Exception
      */
-    private function ensureEffectiveRuntime(int $elapsedTime): void
+    private function ensureEffectiveRuntime(int $elapsedTime)
     {
         $maxRunTime = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
         if ($elapsedTime > $maxRunTime) {

@@ -17,9 +17,9 @@ class FileLockResolver implements SequenceResolver
     /**
      * We should always use exclusive lock to avoid the problem of concurrent access.
      */
-    public const FlockLockOperation = LOCK_EX;
+    const FlockLockOperation = LOCK_EX;
 
-    public const FileOpenMode = 'r+';
+    const FileOpenMode = 'r+';
 
     /**
      * For each lock file, we save 6,000 items, It can contain data generated within 10 minutes,
@@ -189,7 +189,7 @@ class FileLockResolver implements SequenceResolver
      * @param $f resource
      * @return array|null
      */
-    public function getContents($f): ?array
+    public function getContents($f)
     {
         $content = '';
 
@@ -246,9 +246,10 @@ class FileLockResolver implements SequenceResolver
     /**
      * Check path is exists and writable.
      *
+     * @param string|null $lockFileDir
      * @throws Exception
      */
-    protected function preparePath(?string $lockFileDir): string
+    protected function preparePath($lockFileDir): string
     {
         if (empty($lockFileDir)) {
             $lockFileDir = dirname(__DIR__).'/.locks/';

@@ -53,8 +53,9 @@ class RandomSequenceResolver implements SequenceResolver
 
     /**
      * @param  int  $maxSequence
+     * @return void
      */
-    public function setMaxSequence(int $maxSequence): void
+    public function setMaxSequence(int $maxSequence)
     {
         $this->maxSequence = $maxSequence;
     }

@@ -14,17 +14,17 @@ use Exception;
 
 class Snowflake
 {
-    public const MAX_TIMESTAMP_LENGTH = 41;
+    const MAX_TIMESTAMP_LENGTH = 41;
 
-    public const MAX_DATACENTER_LENGTH = 5;
+    const MAX_DATACENTER_LENGTH = 5;
 
-    public const MAX_WORKID_LENGTH = 5;
+    const MAX_WORKID_LENGTH = 5;
 
-    public const MAX_SEQUENCE_LENGTH = 12;
+    const MAX_SEQUENCE_LENGTH = 12;
 
-    public const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
+    const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
 
-    public const MAX_FIRST_LENGTH = 1;
+    const MAX_FIRST_LENGTH = 1;
 
     /**
      * The data center id.

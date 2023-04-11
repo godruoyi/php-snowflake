@@ -19,11 +19,11 @@ class TimeTest extends TestCase
         $s = new Snowflake();
         $a = 0;
 
-        while (($s1 = $s->getcurrentMicrotime()) && $a < 10) {
-            $s2 = $s->getcurrentMicrotime();
+        while (($s1 = $s->getCurrentMillisecond()) && $a < 10) {
+            $s2 = $s->getCurrentMillisecond();
             while ($s1 == $s2) {
                 usleep(1);
-                $s2 = $s->getcurrentMicrotime();
+                $s2 = $s->getCurrentMillisecond();
             }
             $a++;
             $this->assertTrue($s1 != $s2);

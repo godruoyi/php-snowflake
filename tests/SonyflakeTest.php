@@ -170,11 +170,11 @@ class SonyflakeTest extends TestCase
         $this->assertTrue(1 === $snowflake->getStartTimeStamp());
     }
 
-    public function testGetCurrentMicrotime()
+    public function testgetCurrentMillisecond()
     {
         $snowflake = new Sonyflake(9990);
         $now = floor(microtime(true) * 1000) | 0;
-        $time = $snowflake->getCurrentMicrotime();
+        $time = $snowflake->getCurrentMillisecond();
 
         $this->assertTrue($now - $time >= 0);
     }

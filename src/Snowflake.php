@@ -84,10 +84,10 @@ class Snowflake
      */
     public function id()
     {
-        $currentTime = $this->getCurrentMicrotime();
+        $currentTime = $this->getCurrentMillisecond();
         while (($sequence = $this->callResolver($currentTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
             usleep(1);
-            $currentTime = $this->getCurrentMicrotime();
+            $currentTime = $this->getCurrentMillisecond();
         }
 
         $workerLeftMoveLength = self::MAX_SEQUENCE_LENGTH;
@@ -120,11 +120,23 @@ class Snowflake
     }
 
     /**
-     * Get current microtime timestamp.
+     * Get current millisecond time.
+     *
+     * @deprecated the method name is wrong, use getCurrentMillisecond instead, will be removed in next major version.
      *
      * @return int
      */
     public function getCurrentMicrotime()
+    {
+        return floor(microtime(true) * 1000) | 0;
+    }
+
+    /**
+     * Get current millisecond time.
+     *
+     * @return int
+     */
+    public function getCurrentMillisecond(): int
     {
         return floor(microtime(true) * 1000) | 0;
     }
@@ -136,7 +148,7 @@ class Snowflake
      */
     public function setStartTimeStamp(int $millisecond)
     {
-        $missTime = $this->getCurrentMicrotime() - $millisecond;
+        $missTime = $this->getCurrentMillisecond() - $millisecond;
 
         if ($missTime < 0) {
             throw new Exception('The start time cannot be greater than the current time');

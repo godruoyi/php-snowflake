@@ -148,11 +148,11 @@ class SnowflakeTest extends TestCase
         $this->assertSame($payloads['sequence'], '0');
     }
 
-    public function testGetCurrentMicrotime()
+    public function testgetCurrentMillisecond()
     {
         $snowflake = new Snowflake(999, 20);
         $now = floor(microtime(true) * 1000) | 0;
-        $time = $snowflake->getCurrentMicrotime();
+        $time = $snowflake->getCurrentMillisecond();
 
         $this->assertTrue($time >= $now);
     }

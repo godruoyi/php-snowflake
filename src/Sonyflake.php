@@ -78,7 +78,7 @@ class Sonyflake extends Snowflake
      */
     public function setStartTimeStamp(int $millisecond)
     {
-        $elapsedTime = floor(($this->getCurrentMicrotime() - $millisecond) / 10) | 0;
+        $elapsedTime = floor(($this->getCurrentMillisecond() - $millisecond) / 10) | 0;
         if ($elapsedTime < 0) {
             throw new Exception('The start time cannot be greater than the current time');
         }
@@ -131,7 +131,7 @@ class Sonyflake extends Snowflake
      */
     private function elapsedTime(): int
     {
-        return floor(($this->getCurrentMicrotime() - $this->getStartTimeStamp()) / 10) | 0;
+        return floor(($this->getCurrentMillisecond() - $this->getStartTimeStamp()) / 10) | 0;
     }
 
     /**

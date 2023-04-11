@@ -124,6 +124,7 @@ class Snowflake
      *
      * @deprecated the method name is wrong, use getCurrentMillisecond instead, will be removed in next major version.
      * @codeCoverageIgnore
+     *
      * @return int
      */
     public function getCurrentMicrotime()

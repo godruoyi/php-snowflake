@@ -22,6 +22,13 @@ class LaravelSequenceResolver implements SequenceResolver
     protected $cache;
 
     /**
+     * The cache prefix.
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
      * Init resolve instance, must connectioned.
      */
     public function __construct(Repository $cache)
@@ -34,12 +41,22 @@ class LaravelSequenceResolver implements SequenceResolver
      */
     public function sequence(int $currentTime)
     {
-        $key = $currentTime;
+        $key = $this->prefix.$currentTime;
 
         if ($this->cache->add($key, 1, 10)) {
             return 0;
         }
 
         return $this->cache->increment($key, 1);
+    }
+
+    /**
+     * Set cache prefix.
+     */
+    public function setCachePrefix(string $prefix)
+    {
+        $this->prefix = $prefix;
+
+        return $this;
     }
 }

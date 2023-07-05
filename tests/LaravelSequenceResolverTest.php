@@ -29,4 +29,14 @@ class LaravelSequenceResolverTest extends TestCase
         $this->assertEquals(1, $laravel->sequence(1));
         $this->assertEquals(0, $laravel->sequence(1));
     }
+
+    public function testSetCachePrefix()
+    {
+        $mock = $this->createStub(Repository::class);
+
+        $snowflake = new LaravelSequenceResolver($mock);
+        $snowflake->setCachePrefix('foo');
+
+        $this->assertEquals('foo', $this->invokeProperty($snowflake, 'prefix'));
+    }
 }

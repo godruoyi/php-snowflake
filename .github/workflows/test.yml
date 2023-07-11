@@ -31,7 +31,7 @@ jobs:
       run: composer require "illuminate/contracts"
 
     - name: PHPUnit Test
-      run: vendor/bin/phpunit --verbose
+      run: vendor/bin/phpunit --display-incomplete --display-skipped --display-deprecations --display-errors --display-notices --display-warnings
 
   code-coverage:
     name: Code Coverage

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -14,31 +16,23 @@ class SwooleSequenceResolver implements SequenceResolver
 {
     /**
      * The las ttimestamp.
-     *
-     * @var null
      */
-    protected $lastTimeStamp = -1;
+    protected ?int $lastTimeStamp = -1;
 
     /**
      * The sequence.
-     *
-     * @var int
      */
-    protected $sequence = 0;
+    protected int $sequence = 0;
 
     /**
      * The swoole lock.
-     *
-     * @var mixed
      */
-    protected $lock;
+    protected \Swoole\Lock $lock;
 
     /**
      * The cycle count.
-     *
-     * @var int
      */
-    protected $count = 0;
+    protected int $count = 0;
 
     /**
      * Init swoole lock.
@@ -48,10 +42,7 @@ class SwooleSequenceResolver implements SequenceResolver
         $this->lock = new \Swoole\Lock(SWOOLE_MUTEX);
     }
 
-    /**
-     *  {@inheritdoc}
-     */
-    public function sequence(int $currentTime)
+    public function sequence(int $currentTime): int
     {
         // If swoole lock failure，we will return a big number, and recall this method when next millisecond.
         if (! $this->lock->trylock()) {
@@ -78,11 +69,7 @@ class SwooleSequenceResolver implements SequenceResolver
         return $this->sequence;
     }
 
-    /**
-     * @param  \Swoole\Lock  $lock
-     * @return void
-     */
-    public function resetLock(\Swoole\Lock $lock)
+    public function resetLock(\Swoole\Lock $lock): void
     {
         $this->lock = $lock;
     }

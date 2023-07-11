@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -14,29 +16,20 @@ class RandomSequenceResolver implements SequenceResolver
 {
     /**
      * The last timestamp.
-     *
-     * @var null
      */
-    protected $lastTimeStamp = -1;
+    protected int $lastTimeStamp = -1;
 
     /**
      * The sequence.
-     *
-     * @var int
      */
-    protected $sequence = 0;
+    protected int $sequence = 0;
 
     /**
-     * Max sequence number in one ms.
-     *
-     * @var int
+     * Max sequence number in single ms.
      */
-    protected $maxSequence = Snowflake::MAX_SEQUENCE_SIZE;
+    protected int $maxSequence = Snowflake::MAX_SEQUENCE_SIZE;
 
-    /**
-     *  {@inheritdoc}
-     */
-    public function sequence(int $currentTime)
+    public function sequence(int $currentTime): int
     {
         if ($this->lastTimeStamp === $currentTime) {
             $this->sequence++;
@@ -45,15 +38,12 @@ class RandomSequenceResolver implements SequenceResolver
             return $this->sequence;
         }
 
-        $this->sequence = mt_rand(0, $this->maxSequence);
+        $this->sequence = random_int(0, $this->maxSequence);
         $this->lastTimeStamp = $currentTime;
 
         return $this->sequence;
     }
 
-    /**
-     * @param  int  $maxSequence
-     */
     public function setMaxSequence(int $maxSequence): void
     {
         $this->maxSequence = $maxSequence;

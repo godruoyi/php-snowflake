@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -16,37 +18,21 @@ use RedisException;
 class RedisSequenceResolver implements SequenceResolver
 {
     /**
-     * The redis client instance.
-     *
-     * @var Redis
-     */
-    protected $redis;
-
-    /**
      * The cache prefix.
-     *
-     * @var string
      */
-    protected $prefix;
+    protected string $prefix;
 
     /**
-     * Init resolve instance, must connectioned.
+     * Init resolve instance, must be connected.
      */
-    public function __construct(Redis $redis)
+    public function __construct(protected Redis $redis)
     {
-        if ($redis->ping()) {
-            $this->redis = $redis;
-
-            return;
+        if (!$redis->ping()) {
+            throw new RedisException('Redis server went away');
         }
-
-        throw new RedisException('Redis server went away');
     }
 
-    /**
-     *  {@inheritdoc}
-     */
-    public function sequence(int $currentTime)
+    public function sequence(int $currentTime): int
     {
         $lua = <<<'LUA'
 if redis.call('set', KEYS[1], ARGV[1], "EX", ARGV[2], "NX") then
@@ -63,7 +49,7 @@ LUA;
     /**
      * Set cache prefix.
      */
-    public function setCachePrefix(string $prefix)
+    public function setCachePrefix(string $prefix): self
     {
         $this->prefix = $prefix;
 

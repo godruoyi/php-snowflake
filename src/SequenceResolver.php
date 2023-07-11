@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -12,11 +14,5 @@ namespace Godruoyi\Snowflake;
 
 interface SequenceResolver
 {
-    /**
-     * The snowflake.
-     *
-     * @param  int|string  $currentTime current timestamp: milliseconds
-     * @return int
-     */
-    public function sequence(int $currentTime);
+    public function sequence(int $currentTime): int;
 }

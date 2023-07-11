@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -14,27 +16,20 @@ use Exception;
 
 class Sonyflake extends Snowflake
 {
-    const MAX_TIMESTAMP_LENGTH = 39;
+    public const MAX_TIMESTAMP_LENGTH = 39;
 
-    const MAX_MACHINEID_LENGTH = 16;
+    public const MAX_MACHINEID_LENGTH = 16;
 
-    const MAX_SEQUENCE_LENGTH = 8;
+    public const MAX_SEQUENCE_LENGTH = 8;
 
     public const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
-
-    /**
-     * The machine ID.
-     *
-     * @var int
-     */
-    protected $machineid;
 
     /**
      * Build Sonyflake Instance.
      *
      * @param  int  $machineid machine ID 0 ~ 65535 (2^16)-1
      */
-    public function __construct(int $machineid = 0)
+    public function __construct(protected int $machineid = 0)
     {
         $maxMachineID = -1 ^ (-1 << self::MAX_MACHINEID_LENGTH);
 
@@ -47,11 +42,9 @@ class Sonyflake extends Snowflake
     /**
      * Get Sonyflake id.
      *
-     * @return string
-     *
      * @throws Exception
      */
-    public function id()
+    public function id(): string
     {
         $elapsedTime = $this->elapsedTime();
 
@@ -76,7 +69,7 @@ class Sonyflake extends Snowflake
      *
      * @throws Exception
      */
-    public function setStartTimeStamp(int $millisecond)
+    public function setStartTimeStamp(int $millisecond): self
     {
         $elapsedTime = floor(($this->getCurrentMillisecond() - $millisecond) / 10) | 0;
         if ($elapsedTime < 0) {
@@ -126,8 +119,6 @@ class Sonyflake extends Snowflake
 
     /**
      * The Elapsed Time, unit: 10millisecond.
-     *
-     * @return int
      */
     private function elapsedTime(): int
     {
@@ -138,7 +129,6 @@ class Sonyflake extends Snowflake
      * Make sure it's an effective runtime
      *
      * @param  int  $elapsedTime unit: 10millisecond
-     * @return void
      *
      * @throws Exception
      */

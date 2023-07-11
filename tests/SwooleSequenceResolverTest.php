@@ -16,6 +16,13 @@ use Godruoyi\Snowflake\SwooleSequenceResolver;
 
 class SwooleSequenceResolverTest extends TestCase
 {
+    public function setUp(): void
+    {
+        if (version_compare(PHP_VERSION, '8.3') >= 0) {
+            $this->markTestSkipped('Swoole does not yet support PHP 8.3');
+        }
+    }
+
     public function testBasic(): void
     {
         $snowflake = new SwooleSequenceResolver();

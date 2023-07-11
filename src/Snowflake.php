@@ -14,6 +14,7 @@ namespace Godruoyi\Snowflake;
 
 use Closure;
 use Exception;
+use Godruoyi\Snowflake\Converters\Base10ToBase2Converter;
 
 class Snowflake
 {
@@ -91,7 +92,7 @@ class Snowflake
      */
     public function parseId(string $id, bool $transform = false): array
     {
-        $id = decbin($id);
+        $id = Base10ToBase2Converter::convert($id);
 
         $data = [
             'timestamp' => substr($id, 0, -22),
@@ -129,7 +130,7 @@ class Snowflake
         $maxTimeDiff = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
 
         if ($missTime > $maxTimeDiff) {
-            throw new Exception(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
+            throw new PhpSnowflakeException(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
         }
 
         $this->startTime = $millisecond;

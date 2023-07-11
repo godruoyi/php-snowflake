@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -14,7 +16,7 @@ use Godruoyi\Snowflake\SwooleSequenceResolver;
 
 class SwooleSequenceResolverTest extends TestCase
 {
-    public function testBasic()
+    public function testBasic(): void
     {
         $snowflake = new SwooleSequenceResolver();
 
@@ -28,7 +30,7 @@ class SwooleSequenceResolverTest extends TestCase
         $this->assertTrue(2 == $snowflake->sequence(1));
     }
 
-    public function testResetLock()
+    public function testResetLock(): void
     {
         $snowflake = new SwooleSequenceResolver();
 

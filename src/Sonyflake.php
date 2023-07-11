@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Godruoyi\Snowflake;
 
 use Exception;
+use Godruoyi\Snowflake\Converters\Base10ToBase2Converter;
 
 class Sonyflake extends Snowflake
 {
@@ -73,7 +74,7 @@ class Sonyflake extends Snowflake
     {
         $elapsedTime = floor(($this->getCurrentMillisecond() - $millisecond) / 10) | 0;
         if ($elapsedTime < 0) {
-            throw new Exception('The start time cannot be greater than the current time');
+            throw new PhpSnowflakeException('The start time cannot be greater than the current time');
         }
 
         $this->ensureEffectiveRuntime($elapsedTime);
@@ -88,7 +89,7 @@ class Sonyflake extends Snowflake
      */
     public function parseId(string $id, $transform = false): array
     {
-        $id = decbin($id);
+        $id = Base10ToBase2Converter::convert($id);
         $length = self::MAX_SEQUENCE_LENGTH + self::MAX_MACHINEID_LENGTH;
 
         $data = [
@@ -136,7 +137,7 @@ class Sonyflake extends Snowflake
     {
         $maxRunTime = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
         if ($elapsedTime > $maxRunTime) {
-            throw new Exception('Exceeding the maximum life cycle of the algorithm');
+            throw new PhpSnowflakeException('Exceeding the maximum life cycle of the algorithm');
         }
     }
 }

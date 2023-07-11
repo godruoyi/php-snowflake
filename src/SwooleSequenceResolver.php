@@ -47,7 +47,7 @@ class SwooleSequenceResolver implements SequenceResolver
         // If swoole lock failure，we will return a big number, and recall this method when next millisecond.
         if (! $this->lock->trylock()) {
             if ($this->count >= 10) {
-                throw new \Exception('Swoole lock failure, Unable to get the program lock after many attempts.');
+                throw new PhpSnowflakeException('Swoole lock failure, Unable to get the program lock after many attempts.');
             }
 
             $this->count++;

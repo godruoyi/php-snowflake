@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -14,7 +16,7 @@ use Godruoyi\Snowflake\FileLockResolver;
 
 class FileLockResolverTest extends TestCase
 {
-    public function test_prepare_path()
+    public function test_prepare_path(): void
     {
         $resolver = new FileLockResolver();
         $this->assertEquals(dirname(__DIR__).'/.locks/', $this->invokeProperty($resolver, 'lockFileDir'));
@@ -24,7 +26,7 @@ class FileLockResolverTest extends TestCase
         $resolver = new FileLockResolver(__FILE__);
     }
 
-    public function test_prepare_path_not_writable()
+    public function test_prepare_path_not_writable(): void
     {
         $resolver = new FileLockResolver('/tmp/');
         $this->assertEquals('/tmp/', $this->invokeProperty($resolver, 'lockFileDir'));
@@ -41,7 +43,7 @@ class FileLockResolverTest extends TestCase
         rmdir($dir);
     }
 
-    public function test_array_slice()
+    public function test_array_slice(): void
     {
         $a = [1, 2, 3, 4, 5, 6];
 
@@ -52,7 +54,7 @@ class FileLockResolverTest extends TestCase
         $this->assertEquals(['c' => 3, 'd' => 4, 'e' => 5, 'f' => 6], array_slice($a, -4, null, true));
     }
 
-    public function test_clean_old_sequence()
+    public function test_clean_old_sequence(): void
     {
         $resolver = new FileLockResolver;
 
@@ -68,7 +70,7 @@ class FileLockResolverTest extends TestCase
         $this->assertEquals(['d' => 4, 'e' => 5, 'f' => 6], $d);
     }
 
-    public function test_increment_sequence_with_specify_time()
+    public function test_increment_sequence_with_specify_time(): void
     {
         $resolver = new FileLockResolver;
 
@@ -78,7 +80,7 @@ class FileLockResolverTest extends TestCase
         $this->assertEquals(['1' => 1, '2' => 1], $resolver->incrementSequenceWithSpecifyTime([1 => 1], 2));
     }
 
-    public function test_get_contents_with_empty()
+    public function test_get_contents_with_empty(): void
     {
         $resolver = new FileLockResolver;
 
@@ -93,7 +95,7 @@ class FileLockResolverTest extends TestCase
         unlink($path);
     }
 
-    public function test_get_contents_with_serialized_data()
+    public function test_get_contents_with_serialized_data(): void
     {
         $resolver = new FileLockResolver;
         $data = serialize(['a' => 1]);
@@ -109,7 +111,7 @@ class FileLockResolverTest extends TestCase
         unlink($path);
     }
 
-    public function test_get_contents_with_invalid_data()
+    public function test_get_contents_with_invalid_data(): void
     {
         $resolver = new FileLockResolver;
 
@@ -124,7 +126,7 @@ class FileLockResolverTest extends TestCase
         unlink($path);
     }
 
-    public function test_update_contents()
+    public function test_update_contents(): void
     {
         $resolver = new FileLockResolver;
         $path = $this->touch();
@@ -135,7 +137,7 @@ class FileLockResolverTest extends TestCase
         $this->assertEquals(['a' => 'a'], unserialize(file_get_contents($path)));
     }
 
-    public function test_get_sequence_file_not_exists()
+    public function test_get_sequence_file_not_exists(): void
     {
         $path = 'a/b/c/d/e/f';
 
@@ -146,7 +148,7 @@ class FileLockResolverTest extends TestCase
         $this->invokeMethod($resolver, 'getSequence', [$path, $time]);
     }
 
-    public function test_get_sequence_file_cannot_open_file()
+    public function test_get_sequence_file_cannot_open_file(): void
     {
         $path = $this->touch();
         chmod($path, 0444);
@@ -159,13 +161,13 @@ class FileLockResolverTest extends TestCase
         $this->invokeMethod($resolver, 'getSequence', [$path, $time]);
     }
 
-    public function test_get_sequence_file_cannot_lock()
+    public function test_get_sequence_file_cannot_lock(): void
     {
         // @todo add test
         $this->assertTrue(true);
     }
 
-    public function test_get_sequence_with_invalid_content()
+    public function test_get_sequence_with_invalid_content(): void
     {
         $path = $this->touch('x');
         $time = 1;
@@ -176,7 +178,7 @@ class FileLockResolverTest extends TestCase
         $this->invokeMethod($resolver, 'getSequence', [$path, $time]);
     }
 
-    public function test_get_sequence()
+    public function test_get_sequence(): void
     {
         $path = $this->touch();
         $time = 1;
@@ -200,7 +202,7 @@ class FileLockResolverTest extends TestCase
         unlink($path);
     }
 
-    public function test_update_contents_with_content()
+    public function test_update_contents_with_content(): void
     {
         $resolver = new FileLockResolver;
         $data = ['a' => 1, 'c' => 3];
@@ -213,16 +215,15 @@ class FileLockResolverTest extends TestCase
         $this->assertEquals(['a' => 2, 'b' => 3], unserialize(file_get_contents($path)));
     }
 
-    public function test_fnv()
+    public function test_fnv(): void
     {
         $resolver = new FileLockResolver;
         $a = $resolver->fnv('1674128900558');
-        $b = $resolver->fnv(1674128900558);
 
-        $this->assertEquals($a, $b);
+        $this->assertSame(455874157.0, $a);
     }
 
-    public function test_get_shard_lock_index()
+    public function test_get_shard_lock_index(): void
     {
         // reset
         FileLockResolver::$shardCount = 1;
@@ -237,7 +238,7 @@ class FileLockResolverTest extends TestCase
         $this->assertEquals($index, $index2);
     }
 
-    public function test_create_shard_lock_file_with_not_exists_path()
+    public function test_create_shard_lock_file_with_not_exists_path(): void
     {
         $resolver = new FileLockResolver;
         $index = 1;
@@ -249,7 +250,7 @@ class FileLockResolverTest extends TestCase
         unlink($path);
     }
 
-    public function test_create_shard_lock_file_with_exists_path()
+    public function test_create_shard_lock_file_with_exists_path(): void
     {
         $resolver = new FileLockResolver;
         $index = 1;
@@ -266,7 +267,7 @@ class FileLockResolverTest extends TestCase
         unlink($path);
     }
 
-    public function test_filePath()
+    public function test_filePath(): void
     {
         $resolver = new FileLockResolver;
         $index = 1;
@@ -275,7 +276,7 @@ class FileLockResolverTest extends TestCase
         $this->assertTrue(! file_exists($path));
     }
 
-    public function test_sequence()
+    public function test_sequence(): void
     {
         $resolver = new FileLockResolver;
         $resolver->cleanAllLocksFile();
@@ -288,7 +289,7 @@ class FileLockResolverTest extends TestCase
         $this->assertEquals(1, $resolver->sequence(3));
     }
 
-    public function test_sequence_with_max_items()
+    public function test_sequence_with_max_items(): void
     {
         // only one lock file will be generated
         FileLockResolver::$shardCount = 1;
@@ -307,7 +308,7 @@ class FileLockResolverTest extends TestCase
         $this->assertEquals(1, $resolver->sequence(1));
     }
 
-    public function test_preg_match()
+    public function test_preg_match(): void
     {
         $resolver = new FileLockResolver;
         $index = 1;

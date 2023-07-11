@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -15,7 +17,7 @@ use Illuminate\Contracts\Cache\Repository;
 
 class LaravelSequenceResolverTest extends TestCase
 {
-    public function testBasic()
+    public function testBasic(): void
     {
         $mock = $this->createStub(Repository::class);
 
@@ -30,7 +32,7 @@ class LaravelSequenceResolverTest extends TestCase
         $this->assertEquals(0, $laravel->sequence(1));
     }
 
-    public function testSetCachePrefix()
+    public function testSetCachePrefix(): void
     {
         $mock = $this->createStub(Repository::class);
 

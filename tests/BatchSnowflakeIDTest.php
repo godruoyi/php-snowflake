@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -14,7 +16,7 @@ use Godruoyi\Snowflake\Snowflake;
 
 class BatchSnowflakeIDTest extends TestCase
 {
-    public function testBatchUseSameInstance()
+    public function testBatchUseSameInstance(): void
     {
         $ids = [];
         $count = 100000;
@@ -28,7 +30,7 @@ class BatchSnowflakeIDTest extends TestCase
         $this->assertCount($count, $ids);
     }
 
-    public function testBatchForDiffInstance()
+    public function testBatchForDiffInstance(): void
     {
         $ids = [];
         $count = 100000; // 10w

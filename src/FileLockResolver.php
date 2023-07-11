@@ -54,15 +54,13 @@ class FileLockResolver implements SequenceResolver
     /**
      * Get next sequence. move lock/unlock in the same method to avoid lock file not release, this
      * will be more friendly to test.
-     *
-     * @throws Exception
      */
     protected function getSequence(string $filePath, int $currentTime): int
     {
         $f = null;
 
         if (! file_exists($filePath)) {
-            throw new Exception(sprintf('the lock file %s not exists', $filePath));
+            throw new PhpSnowflakeException(sprintf('the lock file %s not exists', $filePath));
         }
 
         try {
@@ -74,7 +72,7 @@ class FileLockResolver implements SequenceResolver
         } catch (\Throwable $e) {
             $this->unlock($f);
 
-            throw new Exception(sprintf('can not open/lock this file %s', $filePath), $e->getCode(), $e);
+            throw new PhpSnowflakeException(sprintf('can not open/lock this file %s', $filePath), $e->getCode(), $e);
         }
 
         // We may get this error if the file contains invalid json, when you get this error,
@@ -82,7 +80,7 @@ class FileLockResolver implements SequenceResolver
         if (is_null($contents = $this->getContents($f))) {
             $this->unlock($f);
 
-            throw new Exception(sprintf('file %s is not a valid lock file.', $filePath));
+            throw new PhpSnowflakeException(sprintf('file %s is not a valid lock file.', $filePath));
         }
 
         $this->updateContents($contents = $this->incrementSequenceWithSpecifyTime(
@@ -221,11 +219,11 @@ class FileLockResolver implements SequenceResolver
         }
 
         if (! is_dir($lockFileDir)) {
-            throw new Exception("{$lockFileDir} is not a directory.");
+            throw new PhpSnowflakeException("{$lockFileDir} is not a directory.");
         }
 
         if (! is_writable($lockFileDir)) {
-            throw new Exception("{$lockFileDir} is not writable.");
+            throw new PhpSnowflakeException("{$lockFileDir} is not writable.");
         }
 
         return $lockFileDir;

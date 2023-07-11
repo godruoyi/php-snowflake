@@ -19,7 +19,7 @@ class LaravelSequenceResolver implements SequenceResolver
     /**
      * The cache prefix.
      */
-    protected string $prefix;
+    protected string $prefix = '';
 
     /**
      * Init resolve instance, must be connected.

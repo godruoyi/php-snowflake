@@ -95,7 +95,7 @@ class FileLockResolver implements SequenceResolver
     /**
      * Unlock and close file.
      *
-     * @param resource $f
+     * @param  resource  $f
      */
     protected function unlock($f): void
     {
@@ -106,7 +106,7 @@ class FileLockResolver implements SequenceResolver
     }
 
     /**
-     * @param resource $f
+     * @param  resource  $f
      */
     public function updateContents(array $contents, $f): bool
     {
@@ -156,7 +156,7 @@ class FileLockResolver implements SequenceResolver
     /**
      * Get resource contents, If the contents are invalid json, return null.
      *
-     * @param resource $f
+     * @param  resource  $f
      */
     public function getContents($f): ?array
     {

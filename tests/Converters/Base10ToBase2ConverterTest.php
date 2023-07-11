@@ -42,7 +42,7 @@ final class Base10ToBase2ConverterTest extends TestCase
 
         yield '1' => ['1', '1'];
 
-        yield '2'  => ['2', '10'];
+        yield '2' => ['2', '10'];
 
         yield 'over max 64 bits' => [
             '9018446744073709551615',

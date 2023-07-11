@@ -27,7 +27,7 @@ class RedisSequenceResolver implements SequenceResolver
      */
     public function __construct(protected Redis $redis)
     {
-        if (!$redis->ping()) {
+        if (! $redis->ping()) {
             throw new RedisException('Redis server went away');
         }
     }

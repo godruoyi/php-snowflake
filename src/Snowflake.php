@@ -186,7 +186,7 @@ class Snowflake
     {
         $resolver = $this->getSequenceResolver();
 
-        if (!is_null($resolver) && is_callable($resolver)) {
+        if (! is_null($resolver) && is_callable($resolver)) {
             return $resolver($currentTime);
         }
 

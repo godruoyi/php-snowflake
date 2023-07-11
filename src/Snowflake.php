@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Godruoyi\Snowflake;
 
+use Closure;
 use Exception;
 
 class Snowflake
@@ -39,7 +40,7 @@ class Snowflake
     /**
      * The Sequence Resolver instance.
      */
-    protected ?SequenceResolver $sequence = null;
+    protected null|Closure|SequenceResolver $sequence = null;
 
     /**
      * The start timestamp.
@@ -49,12 +50,12 @@ class Snowflake
     /**
      * Default sequence resolver.
      */
-    protected ?SequenceResolver $defaultSequenceResolver;
+    protected ?SequenceResolver $defaultSequenceResolver = null;
 
     /**
      * Build Snowflake Instance.
      */
-    public function __construct(?int $datacenter = null, ?int $workerId = null)
+    public function __construct(int $datacenter = -1, int $workerId = -1)
     {
         $maxDataCenter = -1 ^ (-1 << self::MAX_DATACENTER_LENGTH);
         $maxWorkId = -1 ^ (-1 << self::MAX_WORKID_LENGTH);
@@ -164,7 +165,7 @@ class Snowflake
     /**
      * Get Sequence Resolver.
      */
-    public function getSequenceResolver(): ?SequenceResolver
+    public function getSequenceResolver(): null|Closure|SequenceResolver
     {
         return $this->sequence;
     }

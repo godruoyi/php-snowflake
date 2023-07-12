@@ -14,7 +14,6 @@ namespace Godruoyi\Snowflake;
 
 use Closure;
 use Exception;
-use Godruoyi\Snowflake\Converters\Base10ToBase2Converter;
 
 class Snowflake
 {
@@ -92,7 +91,7 @@ class Snowflake
      */
     public function parseId(string $id, bool $transform = false): array
     {
-        $id = Base10ToBase2Converter::convert($id);
+        $id = decbin((int) $id);
 
         $data = [
             'timestamp' => substr($id, 0, -22),

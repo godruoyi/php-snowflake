@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Godruoyi\Snowflake;
 
 use Exception;
-use Godruoyi\Snowflake\Converters\Base10ToBase2Converter;
 
 class Sonyflake extends Snowflake
 {
@@ -89,7 +88,7 @@ class Sonyflake extends Snowflake
      */
     public function parseId(string $id, $transform = false): array
     {
-        $id = Base10ToBase2Converter::convert($id);
+        $id = decbin((int) $id);
         $length = self::MAX_SEQUENCE_LENGTH + self::MAX_MACHINEID_LENGTH;
 
         $data = [

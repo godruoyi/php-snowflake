@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Godruoyi\Snowflake;
 
+use Exception;
+
 class RandomSequenceResolver implements SequenceResolver
 {
     /**
@@ -29,6 +31,9 @@ class RandomSequenceResolver implements SequenceResolver
      */
     protected int $maxSequence = Snowflake::MAX_SEQUENCE_SIZE;
 
+    /**
+     * @throws Exception
+     */
     public function sequence(int $currentTime): int
     {
         if ($this->lastTimeStamp === $currentTime) {

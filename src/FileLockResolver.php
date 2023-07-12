@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Godruoyi\Snowflake;
 
-use Exception;
+use Throwable;
 
 class FileLockResolver implements SequenceResolver
 {
@@ -34,7 +34,7 @@ class FileLockResolver implements SequenceResolver
     public static int $shardCount = 32;
 
     /**
-     * @throws Exception
+     * @throws SnowflakeException
      */
     public function __construct(protected ?string $lockFileDir = null)
     {
@@ -42,7 +42,7 @@ class FileLockResolver implements SequenceResolver
     }
 
     /**
-     * @throws Exception when can not open lock file
+     * @throws SnowflakeException
      */
     public function sequence(int $currentTime): int
     {
@@ -54,6 +54,7 @@ class FileLockResolver implements SequenceResolver
     /**
      * Get next sequence. move lock/unlock in the same method to avoid lock file not release, this
      * will be more friendly to test.
+     * @throws SnowflakeException
      */
     protected function getSequence(string $filePath, int $currentTime): int
     {
@@ -69,7 +70,7 @@ class FileLockResolver implements SequenceResolver
             // we always use exclusive lock to avoid the problem of concurrent access.
             // so we don't need to check the return value of flock.
             flock($f, static::FlockLockOperation);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->unlock($f);
 
             throw new SnowflakeException(sprintf('can not open/lock this file %s', $filePath), $e->getCode(), $e);
@@ -176,7 +177,7 @@ class FileLockResolver implements SequenceResolver
             if (is_array($data = unserialize($content))) {
                 return $data;
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
 
         return null;
@@ -209,8 +210,7 @@ class FileLockResolver implements SequenceResolver
 
     /**
      * Check path is exists and writable.
-     *
-     * @throws Exception
+     * @throws SnowflakeException
      */
     protected function preparePath(?string $lockFileDir): string
     {

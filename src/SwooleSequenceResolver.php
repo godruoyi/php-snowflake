@@ -42,6 +42,9 @@ class SwooleSequenceResolver implements SequenceResolver
         $this->lock = new \Swoole\Lock(SWOOLE_MUTEX);
     }
 
+    /**
+     * @throws SnowflakeException
+     */
     public function sequence(int $currentTime): int
     {
         // If swoole lock failure，we will return a big number, and recall this method when next millisecond.

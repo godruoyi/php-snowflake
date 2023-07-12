@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace Godruoyi\Snowflake;
 
-use Exception;
-
 class Sonyflake extends Snowflake
 {
     public const MAX_TIMESTAMP_LENGTH = 39;
@@ -27,22 +25,20 @@ class Sonyflake extends Snowflake
     /**
      * Build Sonyflake Instance.
      *
-     * @param  int  $machineid machine ID 0 ~ 65535 (2^16)-1
+     * @param int $machineId machine ID 0 ~ 65535 (2^16)-1
      */
-    public function __construct(protected int $machineid = 0)
+    public function __construct(protected int $machineId = 0)
     {
         $maxMachineID = -1 ^ (-1 << self::MAX_MACHINEID_LENGTH);
 
-        $this->machineid = $machineid;
-        if ($this->machineid < 0 || $this->machineid > $maxMachineID) {
+        if ($this->machineId < 0 || $this->machineId > $maxMachineID) {
             throw new \InvalidArgumentException("Invalid machine ID, must be between 0 ~ {$maxMachineID}.");
         }
     }
 
     /**
      * Get Sonyflake id.
-     *
-     * @throws Exception
+     * @throws SnowflakeException
      */
     public function id(): string
     {
@@ -50,7 +46,7 @@ class Sonyflake extends Snowflake
 
         while (($sequence = $this->callResolver($elapsedTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
             $nextMillisecond = $this->elapsedTime();
-            while ($nextMillisecond == $elapsedTime) {
+            while ($nextMillisecond === $elapsedTime) {
                 usleep(1);
                 $nextMillisecond = $this->elapsedTime();
             }
@@ -60,14 +56,13 @@ class Sonyflake extends Snowflake
         $this->ensureEffectiveRuntime($elapsedTime);
 
         return (string) ($elapsedTime << (self::MAX_MACHINEID_LENGTH + self::MAX_SEQUENCE_LENGTH)
-            | ($this->machineid << self::MAX_SEQUENCE_LENGTH)
+            | ($this->machineId << self::MAX_SEQUENCE_LENGTH)
             | ($sequence));
     }
 
     /**
      * Set start time (millisecond).
-     *
-     * @throws Exception
+     * @throws SnowflakeException
      */
     public function setStartTimeStamp(int $millisecond): self
     {
@@ -97,7 +92,7 @@ class Sonyflake extends Snowflake
             'timestamp' => substr($id, 0, strlen($id) - $length),
         ];
 
-        return $transform ? array_map(function ($value) {
+        return $transform ? array_map(static function ($value) {
             return bindec($value);
         }, $data) : $data;
     }
@@ -127,10 +122,7 @@ class Sonyflake extends Snowflake
 
     /**
      * Make sure it's an effective runtime
-     *
-     * @param  int  $elapsedTime unit: 10millisecond
-     *
-     * @throws Exception
+     * @throws SnowflakeException
      */
     private function ensureEffectiveRuntime(int $elapsedTime): void
     {

@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Godruoyi\Snowflake;
 
 use Closure;
-use Exception;
 
 class Snowflake
 {
@@ -35,7 +34,7 @@ class Snowflake
     /**
      * The worker id.
      */
-    protected int $workerid;
+    protected int $workerId;
 
     /**
      * The Sequence Resolver instance.
@@ -55,14 +54,14 @@ class Snowflake
     /**
      * Build Snowflake Instance.
      */
-    public function __construct(int $datacenter = -1, int $workerId = -1)
+    public function __construct(int $datacenter = 0, int $workerId = 0)
     {
         $maxDataCenter = -1 ^ (-1 << self::MAX_DATACENTER_LENGTH);
         $maxWorkId = -1 ^ (-1 << self::MAX_WORKID_LENGTH);
 
         // If not set datacenter or workid, we will set a default value to use.
         $this->datacenter = $datacenter > $maxDataCenter || $datacenter < 0 ? random_int(0, 31) : $datacenter;
-        $this->workerid = $workerId > $maxWorkId || $workerId < 0 ? random_int(0, 31) : $workerId;
+        $this->workerId = $workerId > $maxWorkId || $workerId < 0 ? random_int(0, 31) : $workerId;
     }
 
     /**
@@ -82,7 +81,7 @@ class Snowflake
 
         return (string) ((($currentTime - $this->getStartTimeStamp()) << $timestampLeftMoveLength)
             | ($this->datacenter << $datacenterLeftMoveLength)
-            | ($this->workerid << $workerLeftMoveLength)
+            | ($this->workerId << $workerLeftMoveLength)
             | ($sequence));
     }
 
@@ -100,7 +99,7 @@ class Snowflake
             'datacenter' => substr($id, -22, 5),
         ];
 
-        return $transform ? array_map(function ($value) {
+        return $transform ? array_map(static function ($value) {
             return bindec($value);
         }, $data) : $data;
     }
@@ -115,15 +114,14 @@ class Snowflake
 
     /**
      * Set start time (millisecond).
-     *
-     * @throws Exception
+     * @throws SnowflakeException
      */
     public function setStartTimeStamp(int $millisecond): self
     {
         $missTime = $this->getCurrentMillisecond() - $millisecond;
 
         if ($missTime < 0) {
-            throw new Exception('The start time cannot be greater than the current time');
+            throw new SnowflakeException('The start time cannot be greater than the current time');
         }
 
         $maxTimeDiff = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);

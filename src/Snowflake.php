@@ -129,7 +129,7 @@ class Snowflake
         $maxTimeDiff = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
 
         if ($missTime > $maxTimeDiff) {
-            throw new PhpSnowflakeException(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
+            throw new SnowflakeException(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
         }
 
         $this->startTime = $millisecond;

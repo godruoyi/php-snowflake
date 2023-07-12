@@ -14,6 +14,6 @@ namespace Godruoyi\Snowflake;
 
 use Exception;
 
-class PhpSnowflakeException extends Exception
+class SnowflakeException extends Exception
 {
 }

@@ -73,7 +73,7 @@ class Sonyflake extends Snowflake
     {
         $elapsedTime = floor(($this->getCurrentMillisecond() - $millisecond) / 10) | 0;
         if ($elapsedTime < 0) {
-            throw new PhpSnowflakeException('The start time cannot be greater than the current time');
+            throw new SnowflakeException('The start time cannot be greater than the current time');
         }
 
         $this->ensureEffectiveRuntime($elapsedTime);
@@ -136,7 +136,7 @@ class Sonyflake extends Snowflake
     {
         $maxRunTime = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
         if ($elapsedTime > $maxRunTime) {
-            throw new PhpSnowflakeException('Exceeding the maximum life cycle of the algorithm');
+            throw new SnowflakeException('Exceeding the maximum life cycle of the algorithm');
         }
     }
 }

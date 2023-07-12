@@ -32,19 +32,19 @@ class SnowflakeTest extends TestCase
         $snowflake = new Snowflake(-1, -1);
 
         $dataID = $this->invokeProperty($snowflake, 'datacenter');
-        $workID = $this->invokeProperty($snowflake, 'workerid');
+        $workID = $this->invokeProperty($snowflake, 'workerId');
         $this->assertTrue($workID >= 0 && $workID <= 31);
         $this->assertTrue($dataID >= 0 && $dataID <= 31);
 
         $snowflake = new Snowflake(33, 33);
         $dataID = $this->invokeProperty($snowflake, 'datacenter');
-        $workID = $this->invokeProperty($snowflake, 'workerid');
+        $workID = $this->invokeProperty($snowflake, 'workerId');
         $this->assertTrue($workID >= 0 && $workID <= 31);
         $this->assertTrue($dataID >= 0 && $dataID <= 31);
 
         $snowflake = new Snowflake();
         $dataID = $this->invokeProperty($snowflake, 'datacenter');
-        $workID = $this->invokeProperty($snowflake, 'workerid');
+        $workID = $this->invokeProperty($snowflake, 'workerId');
         $this->assertTrue($workID >= 0 && $workID <= 31);
         $this->assertTrue($dataID >= 0 && $dataID <= 31);
     }

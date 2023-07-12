@@ -27,7 +27,7 @@ class SonyflakeTest extends TestCase
 
         $snowflake = new Sonyflake(0);
         $this->assertInstanceOf(Sonyflake::class, $snowflake);
-        $this->assertEquals(0, $this->invokeProperty($snowflake, 'machineid'));
+        $this->assertEquals(0, $this->invokeProperty($snowflake, 'machineId'));
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid machine ID, must be between 0 ~ 65535.');
@@ -35,7 +35,7 @@ class SonyflakeTest extends TestCase
 
         $snowflake = new Sonyflake(65535);
         $this->assertInstanceOf(Sonyflake::class, $snowflake);
-        $this->assertEquals(65535, $this->invokeProperty($snowflake, 'machineid'));
+        $this->assertEquals(65535, $this->invokeProperty($snowflake, 'machineId'));
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid machine ID, must be between 0 ~ 65535.');

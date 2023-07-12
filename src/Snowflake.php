@@ -114,6 +114,7 @@ class Snowflake
 
     /**
      * Set start time (millisecond).
+     *
      * @throws SnowflakeException
      */
     public function setStartTimeStamp(int $millisecond): self

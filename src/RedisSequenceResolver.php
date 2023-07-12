@@ -24,6 +24,7 @@ class RedisSequenceResolver implements SequenceResolver
 
     /**
      * Init resolve instance, must be connected.
+     *
      * @throws RedisException
      */
     public function __construct(protected Redis $redis)

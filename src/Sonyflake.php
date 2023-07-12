@@ -25,7 +25,7 @@ class Sonyflake extends Snowflake
     /**
      * Build Sonyflake Instance.
      *
-     * @param int $machineId machine ID 0 ~ 65535 (2^16)-1
+     * @param  int  $machineId machine ID 0 ~ 65535 (2^16)-1
      */
     public function __construct(protected int $machineId = 0)
     {
@@ -38,6 +38,7 @@ class Sonyflake extends Snowflake
 
     /**
      * Get Sonyflake id.
+     *
      * @throws SnowflakeException
      */
     public function id(): string
@@ -62,6 +63,7 @@ class Sonyflake extends Snowflake
 
     /**
      * Set start time (millisecond).
+     *
      * @throws SnowflakeException
      */
     public function setStartTimeStamp(int $millisecond): self
@@ -122,6 +124,7 @@ class Sonyflake extends Snowflake
 
     /**
      * Make sure it's an effective runtime
+     *
      * @throws SnowflakeException
      */
     private function ensureEffectiveRuntime(int $elapsedTime): void

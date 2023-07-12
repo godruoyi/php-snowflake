@@ -54,6 +54,7 @@ class FileLockResolver implements SequenceResolver
     /**
      * Get next sequence. move lock/unlock in the same method to avoid lock file not release, this
      * will be more friendly to test.
+     *
      * @throws SnowflakeException
      */
     protected function getSequence(string $filePath, int $currentTime): int
@@ -210,6 +211,7 @@ class FileLockResolver implements SequenceResolver
 
     /**
      * Check path is exists and writable.
+     *
      * @throws SnowflakeException
      */
     protected function preparePath(?string $lockFileDir): string

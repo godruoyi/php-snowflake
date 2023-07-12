@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -15,7 +17,7 @@ use Godruoyi\Snowflake\Snowflake;
 
 class RandomSequenceResolverTest extends TestCase
 {
-    public function testBasic()
+    public function testBasic(): void
     {
         $random = new RandomSequenceResolver();
         $seqs = [];
@@ -27,7 +29,7 @@ class RandomSequenceResolverTest extends TestCase
         $this->assertCount(Snowflake::MAX_SEQUENCE_SIZE, $seqs);
     }
 
-    public function testCanGenerateUniqueIdBySnowflake()
+    public function testCanGenerateUniqueIdBySnowflake(): void
     {
         $snowflake = new Snowflake(1, 1);
         $seqs = [];

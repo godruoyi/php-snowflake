@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -10,36 +12,26 @@
 
 namespace Godruoyi\Snowflake;
 
-use Exception;
-
 class Sonyflake extends Snowflake
 {
-    const MAX_TIMESTAMP_LENGTH = 39;
+    public const MAX_TIMESTAMP_LENGTH = 39;
 
-    const MAX_MACHINEID_LENGTH = 16;
+    public const MAX_MACHINEID_LENGTH = 16;
 
-    const MAX_SEQUENCE_LENGTH = 8;
+    public const MAX_SEQUENCE_LENGTH = 8;
 
     public const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
 
     /**
-     * The machine ID.
-     *
-     * @var int
-     */
-    protected $machineid;
-
-    /**
      * Build Sonyflake Instance.
      *
-     * @param  int  $machineid machine ID 0 ~ 65535 (2^16)-1
+     * @param  int  $machineId machine ID 0 ~ 65535 (2^16)-1
      */
-    public function __construct(int $machineid = 0)
+    public function __construct(protected int $machineId = 0)
     {
         $maxMachineID = -1 ^ (-1 << self::MAX_MACHINEID_LENGTH);
 
-        $this->machineid = $machineid;
-        if ($this->machineid < 0 || $this->machineid > $maxMachineID) {
+        if ($this->machineId < 0 || $this->machineId > $maxMachineID) {
             throw new \InvalidArgumentException("Invalid machine ID, must be between 0 ~ {$maxMachineID}.");
         }
     }
@@ -47,17 +39,15 @@ class Sonyflake extends Snowflake
     /**
      * Get Sonyflake id.
      *
-     * @return string
-     *
-     * @throws Exception
+     * @throws SnowflakeException
      */
-    public function id()
+    public function id(): string
     {
         $elapsedTime = $this->elapsedTime();
 
         while (($sequence = $this->callResolver($elapsedTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
             $nextMillisecond = $this->elapsedTime();
-            while ($nextMillisecond == $elapsedTime) {
+            while ($nextMillisecond === $elapsedTime) {
                 usleep(1);
                 $nextMillisecond = $this->elapsedTime();
             }
@@ -67,20 +57,20 @@ class Sonyflake extends Snowflake
         $this->ensureEffectiveRuntime($elapsedTime);
 
         return (string) ($elapsedTime << (self::MAX_MACHINEID_LENGTH + self::MAX_SEQUENCE_LENGTH)
-            | ($this->machineid << self::MAX_SEQUENCE_LENGTH)
+            | ($this->machineId << self::MAX_SEQUENCE_LENGTH)
             | ($sequence));
     }
 
     /**
      * Set start time (millisecond).
      *
-     * @throws Exception
+     * @throws SnowflakeException
      */
-    public function setStartTimeStamp(int $millisecond)
+    public function setStartTimeStamp(int $millisecond): self
     {
         $elapsedTime = floor(($this->getCurrentMillisecond() - $millisecond) / 10) | 0;
         if ($elapsedTime < 0) {
-            throw new Exception('The start time cannot be greater than the current time');
+            throw new SnowflakeException('The start time cannot be greater than the current time');
         }
 
         $this->ensureEffectiveRuntime($elapsedTime);
@@ -95,7 +85,7 @@ class Sonyflake extends Snowflake
      */
     public function parseId(string $id, $transform = false): array
     {
-        $id = decbin($id);
+        $id = decbin((int) $id);
         $length = self::MAX_SEQUENCE_LENGTH + self::MAX_MACHINEID_LENGTH;
 
         $data = [
@@ -104,7 +94,7 @@ class Sonyflake extends Snowflake
             'timestamp' => substr($id, 0, strlen($id) - $length),
         ];
 
-        return $transform ? array_map(function ($value) {
+        return $transform ? array_map(static function ($value) {
             return bindec($value);
         }, $data) : $data;
     }
@@ -126,8 +116,6 @@ class Sonyflake extends Snowflake
 
     /**
      * The Elapsed Time, unit: 10millisecond.
-     *
-     * @return int
      */
     private function elapsedTime(): int
     {
@@ -137,16 +125,13 @@ class Sonyflake extends Snowflake
     /**
      * Make sure it's an effective runtime
      *
-     * @param  int  $elapsedTime unit: 10millisecond
-     * @return void
-     *
-     * @throws Exception
+     * @throws SnowflakeException
      */
     private function ensureEffectiveRuntime(int $elapsedTime): void
     {
         $maxRunTime = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
         if ($elapsedTime > $maxRunTime) {
-            throw new Exception('Exceeding the maximum life cycle of the algorithm');
+            throw new SnowflakeException('Exceeding the maximum life cycle of the algorithm');
         }
     }
 }

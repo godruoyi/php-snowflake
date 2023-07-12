@@ -55,7 +55,7 @@ Snowflake 是 Twitter 内部的一个 ID 生算法，可以通过一些简单的
 
 ## 要求
 
-1. PHP >= 7.0
+1. PHP >= 8.1
 2. **[Composer](https://getcomposer.org/)**
 
 ## 安装

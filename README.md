@@ -24,7 +24,7 @@
 
 ## Description
 
-Snowflake algorithm PHP implementation [中文文档](https://github.com/godruoyi/php-snowflake/blob/master/README-zh_CN.md).
+Snowflake & Sonyflake algorithm PHP implementation [中文文档](https://github.com/godruoyi/php-snowflake/blob/master/README-zh_CN.md).
 
 ![file](https://images.godruoyi.com/logos/201908/13/_1565672621_LPW65Pi8cG.png)
 
@@ -56,7 +56,7 @@ Each provider only needs to ensure that the serial number generated in the same 
 
 ## Requirement
 
-1. PHP >= 7.2
+1. PHP >= 8.1
 2. **[Composer](https://getcomposer.org/)**
 
 ## Installation
@@ -65,7 +65,7 @@ Each provider only needs to ensure that the serial number generated in the same 
 $ composer require godruoyi/php-snowflake -vvv
 ```
 
-## Useage
+## Usage
 
 1. simple to use.
 
@@ -93,6 +93,13 @@ $snowflake->setStartTimeStamp(strtotime('2019-09-09')*1000); // millisecond
 $snowflake->id();
 ```
 
+4. Use Sonyflake
+
+```php
+$sonyflake = new \Godruoyi\Snowflake\Sonyflake;
+
+$sonyflake->id();
+```
 ## Advanced
 
 1. Used in Laravel.

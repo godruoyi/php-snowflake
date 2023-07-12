@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -15,7 +17,7 @@ use RedisException;
 
 class RedisSequenceResolverTest extends TestCase
 {
-    public function testInvalidRedisConnect()
+    public function testInvalidRedisConnect(): void
     {
         $redis = $this->createMock(\Redis::class);
         $redis->expects($this->once())->method('ping')->willReturn(false);
@@ -25,7 +27,7 @@ class RedisSequenceResolverTest extends TestCase
         new RedisSequenceResolver($redis);
     }
 
-    public function testSequence()
+    public function testSequence(): void
     {
         $redis = $this->createMock(\Redis::class);
         $redis->expects($this->once())->method('ping')->willReturn(true);
@@ -39,7 +41,7 @@ class RedisSequenceResolverTest extends TestCase
         $this->assertTrue(3 == $snowflake->sequence(1));
     }
 
-    public function testSetCachePrefix()
+    public function testSetCachePrefix(): void
     {
         $redis = $this->createMock(\Redis::class);
         $redis->expects($this->once())->method('ping')->willReturn(true);

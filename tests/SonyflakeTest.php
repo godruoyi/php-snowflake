@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -18,14 +20,14 @@ use ReflectionException;
 
 class SonyflakeTest extends TestCase
 {
-    public function testBasic()
+    public function testBasic(): void
     {
         $snowflake = new Sonyflake();
         $this->assertInstanceOf(Sonyflake::class, $snowflake);
 
         $snowflake = new Sonyflake(0);
         $this->assertInstanceOf(Sonyflake::class, $snowflake);
-        $this->assertEquals(0, $this->invokeProperty($snowflake, 'machineid'));
+        $this->assertEquals(0, $this->invokeProperty($snowflake, 'machineId'));
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid machine ID, must be between 0 ~ 65535.');
@@ -33,14 +35,14 @@ class SonyflakeTest extends TestCase
 
         $snowflake = new Sonyflake(65535);
         $this->assertInstanceOf(Sonyflake::class, $snowflake);
-        $this->assertEquals(65535, $this->invokeProperty($snowflake, 'machineid'));
+        $this->assertEquals(65535, $this->invokeProperty($snowflake, 'machineId'));
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid machine ID, must be between 0 ~ 65535.');
         $snowflake = new Sonyflake(65536);
     }
 
-    public function testSetStartTimeStamp()
+    public function testSetStartTimeStamp(): void
     {
         $snowflake = new Sonyflake(110);
 
@@ -49,7 +51,7 @@ class SonyflakeTest extends TestCase
         $snowflake->setStartTimeStamp(strtotime('1840-01-01 00:00:00') * 1000); // 2021 - 1840 = 181 > The lifetime (174 years)
     }
 
-    public function testSetStartTimeStampCannotGreaterThanCurrentTime()
+    public function testSetStartTimeStampCannotGreaterThanCurrentTime(): void
     {
         $snowflake = new Sonyflake(110);
 
@@ -61,7 +63,7 @@ class SonyflakeTest extends TestCase
         $this->assertEquals(1, $snowflake->getStartTimeStamp());
     }
 
-    public function testSetStartTimeStampBasic()
+    public function testSetStartTimeStampBasic(): void
     {
         $snowflake = new Sonyflake(110);
 
@@ -70,7 +72,7 @@ class SonyflakeTest extends TestCase
         $this->assertEquals(1, $snowflake->getStartTimeStamp());
     }
 
-    public function testParseId()
+    public function testParseId(): void
     {
         $snowflake = new Sonyflake(110);
         $id = $snowflake->id();
@@ -88,7 +90,7 @@ class SonyflakeTest extends TestCase
         $this->assertTrue(110 == $dumps['machineid']);
     }
 
-    public function testId()
+    public function testId(): void
     {
         $snowflake = new Sonyflake();
         $id = $snowflake->id();
@@ -106,7 +108,7 @@ class SonyflakeTest extends TestCase
     /**
      * @throws ReflectionException
      */
-    public function testGenerateIDWithMaxElapsedTime()
+    public function testGenerateIDWithMaxElapsedTime(): void
     {
         $snowflake = new Sonyflake(110);
         $reflection = new \ReflectionProperty(get_class($snowflake), 'startTime');
@@ -117,7 +119,7 @@ class SonyflakeTest extends TestCase
         $snowflake->id();
     }
 
-    public function testGenerateID()
+    public function testGenerateID(): void
     {
         $snowflake = new Sonyflake(1);
         $snowflake->setStartTimeStamp(1);
@@ -140,14 +142,14 @@ class SonyflakeTest extends TestCase
         $this->assertNotEmpty($snowflake->id());
     }
 
-    public function testGetDefaultSequenceResolver()
+    public function testGetDefaultSequenceResolver(): void
     {
         $snowflake = new Sonyflake(1);
         $this->assertInstanceOf(SequenceResolver::class, $snowflake->getDefaultSequenceResolver());
         $this->assertInstanceOf(RandomSequenceResolver::class, $snowflake->getDefaultSequenceResolver());
     }
 
-    public function testGetSequenceResolver()
+    public function testGetSequenceResolver(): void
     {
         $snowflake = new Sonyflake(9);
         $this->assertTrue(is_null($snowflake->getSequenceResolver()));
@@ -159,7 +161,7 @@ class SonyflakeTest extends TestCase
         $this->assertTrue(is_callable($snowflake->getSequenceResolver()));
     }
 
-    public function testGetStartTimeStamp()
+    public function testGetStartTimeStamp(): void
     {
         $snowflake = new Sonyflake(999);
         $defaultTime = '2019-08-08 08:08:08';
@@ -170,7 +172,7 @@ class SonyflakeTest extends TestCase
         $this->assertTrue(1 === $snowflake->getStartTimeStamp());
     }
 
-    public function testgetCurrentMillisecond()
+    public function testgetCurrentMillisecond(): void
     {
         $snowflake = new Sonyflake(9990);
         $now = floor(microtime(true) * 1000) | 0;

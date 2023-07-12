@@ -12,7 +12,8 @@ declare(strict_types=1);
 
 namespace Godruoyi\Snowflake;
 
-interface SequenceResolver
+use Exception;
+
+class SnowflakeException extends Exception
 {
-    public function sequence(int $currentTime): int;
 }

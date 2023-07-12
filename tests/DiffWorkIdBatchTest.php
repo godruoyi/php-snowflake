@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the godruoyi/php-snowflake.
  *
@@ -14,7 +16,7 @@ use Godruoyi\Snowflake\Snowflake;
 
 class DiffWorkIdBatchTest extends TestCase
 {
-    public function testDissWorkID()
+    public function testDissWorkID(): void
     {
         $snowflake = new Snowflake(1, 1);
 

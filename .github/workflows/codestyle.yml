@@ -28,9 +28,6 @@ jobs:
       - name: Install Laravel Illuminate Contracts
         run: composer require "illuminate/contracts"
 
-      - name: Install Laravel pint
-        run: composer require "laravel/pint"
-
       - name: Code Style
         run: vendor/bin/pint --test --config ./pint.json
 

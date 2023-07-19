@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Godruoyi\Snowflake\FileLockResolver;
+use Godruoyi\Snowflake\SnowflakeException;
 
 class FileLockResolverTest extends TestCase
 {
@@ -267,7 +268,7 @@ class FileLockResolverTest extends TestCase
         unlink($path);
     }
 
-    public function test_filePath(): void
+    public function test_file_path(): void
     {
         $resolver = new FileLockResolver;
         $index = 1;
@@ -315,6 +316,26 @@ class FileLockResolverTest extends TestCase
         $path = $this->invokeMethod($resolver, 'filePath', [$index]);
 
         $this->assertTrue(preg_match('/snowflake-(\d+)\.lock$/', $path) !== false);
+    }
+
+    /**
+     * @throws SnowflakeException
+     */
+    public function test_can_clean_lock_file()
+    {
+        FileLockResolver::$shardCount = 1;
+        $fileResolver = new FileLockResolver;
+
+        // this operation will generate a lock file
+        $fileResolver->sequence(1);
+
+        $path = $this->invokeMethod($fileResolver, 'filePath', [0]);
+
+        $this->assertFileExists($path);
+
+        $fileResolver->cleanAllLocksFile();
+
+        $this->assertFileDoesNotExist($path);
     }
 
     private function touch($content = '')

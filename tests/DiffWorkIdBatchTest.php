@@ -16,7 +16,7 @@ use Godruoyi\Snowflake\Snowflake;
 
 class DiffWorkIdBatchTest extends TestCase
 {
-    public function testDissWorkID(): void
+    public function test_diss_work_id(): void
     {
         $snowflake = new Snowflake(1, 1);
 

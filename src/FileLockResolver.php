@@ -178,7 +178,7 @@ class FileLockResolver implements SequenceResolver
             if (is_array($data = unserialize($content))) {
                 return $data;
             }
-        } catch (Throwable $e) {
+        } catch (Throwable) {
         }
 
         return null;
@@ -233,6 +233,8 @@ class FileLockResolver implements SequenceResolver
 
     /**
      * Generate shard lock file.
+     *
+     * @throws SnowflakeException
      */
     protected function createShardLockFile(int $index): string
     {
@@ -242,7 +244,12 @@ class FileLockResolver implements SequenceResolver
             return $path;
         }
 
-        touch($path);
+        $f = fopen($path, 'a');
+        if (! $f) {
+            throw new SnowflakeException(sprintf('can not create lock file %s', $path));
+        }
+
+        $this->unlock($f);
 
         return $path;
     }

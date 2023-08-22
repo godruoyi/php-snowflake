@@ -176,3 +176,4 @@ $snowflake->setSequenceResolver(function ($currentMillisecond) {
 ## License
 
 MIT
+MIT

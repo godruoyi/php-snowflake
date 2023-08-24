@@ -66,7 +66,7 @@ class FileLockResolver implements SequenceResolver
         }
 
         try {
-            $f = fopen($filePath, static::FileOpenMode);
+            $f = @fopen($filePath, static::FileOpenMode);
 
             // we always use exclusive lock to avoid the problem of concurrent access.
             // so we don't need to check the return value of flock.
@@ -175,7 +175,7 @@ class FileLockResolver implements SequenceResolver
         }
 
         try {
-            if (is_array($data = unserialize($content))) {
+            if (is_array($data = @unserialize($content))) {
                 return $data;
             }
         } catch (Throwable) {

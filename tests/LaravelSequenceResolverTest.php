@@ -19,7 +19,7 @@ class LaravelSequenceResolverTest extends TestCase
 {
     protected function setUp(): void
     {
-        if (! class_exists(Repository::class)) {
+        if (! interface_exists(Repository::class)) {
             $this->markTestSkipped('Laravel cache component is not installed.');
         }
     }

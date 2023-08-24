@@ -58,26 +58,21 @@ class BatchSnowflakeIDTest extends TestCase
             $this->markTestSkipped('The pcntl extension is not installed.');
         }
 
-        $redis = new \Redis();
-        $redis->connect(getenv('REDIS_HOST'), getenv('REDIS_PORT') | 0);
+        $this->parallelRun(function () {
+            $redis = new \Redis();
+            $redis->connect(getenv('REDIS_HOST'), getenv('REDIS_PORT') | 0);
 
-        $snowflake = (new Snowflake(0, 0))
-            ->setSequenceResolver(new RedisSequenceResolver($redis))
-            ->setStartTimeStamp(strtotime('2022-12-14') * 1000);
-
-        $this->parallelRun($snowflake, 100, 10000);
+            return new RedisSequenceResolver($redis);
+        }, 100, 1000);
     }
 
     public function test_batch_for_diff_instance_with_file_driver()
     {
-        $fileResolver = new FileLockResolver(__DIR__.'/../.locks');
-        $fileResolver->cleanAllLocksFile();
+        $fileResolver = new FileLockResolver();
 
-        $snowflake = (new Snowflake(0, 0))
-            ->setSequenceResolver($fileResolver)
-            ->setStartTimeStamp(strtotime('2022-12-14') * 1000);
-
-        $this->parallelRun($snowflake, 100, 1000);
+        $this->parallelRun(function () use ($fileResolver) {
+            return $fileResolver;
+        }, 100, 1000);
 
         $fileResolver->cleanAllLocksFile();
     }
@@ -85,16 +80,20 @@ class BatchSnowflakeIDTest extends TestCase
     /**
      * Runs the given function in parallel using the specified number of processes.
      *
-     * @param  Snowflake  $snowflake A Snowflake instance used to generate unique IDs.
+     * @param  callable  $resolver
      * @param  int  $parallel The number of processes to run in parallel.
      * @param  int  $count The number of times to run the function.
      * @return void
      *
      * @throws Throwable
      */
-    protected function parallelRun(Snowflake $snowflake, int $parallel, int $count): void
+    protected function parallelRun(callable $resolver, int $parallel, int $count): void
     {
-        $results = Support\Parallel::run(function () use ($snowflake, $count) {
+        $results = Support\Parallel::run(function () use ($resolver, $count) {
+            $snowflake = (new Snowflake(0, 0))
+                ->setSequenceResolver($resolver())
+                ->setStartTimeStamp(strtotime('2022-12-14') * 1000);
+
             $ids = [];
             for ($i = 0; $i < $count; $i++) {
                 $ids[] = $snowflake->id();

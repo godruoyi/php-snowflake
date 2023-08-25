@@ -23,7 +23,7 @@ class SwooleSequenceResolverTest extends TestCase
         }
     }
 
-    public function testBasic(): void
+    public function test_basic(): void
     {
         $snowflake = new SwooleSequenceResolver();
 
@@ -37,7 +37,7 @@ class SwooleSequenceResolverTest extends TestCase
         $this->assertTrue(2 == $snowflake->sequence(1));
     }
 
-    public function testResetLock(): void
+    public function test_reset_lock(): void
     {
         $snowflake = new SwooleSequenceResolver();
 
@@ -53,5 +53,18 @@ class SwooleSequenceResolverTest extends TestCase
         while (true) {
             $snowflake->sequence(1);
         }
+    }
+
+    public function test_real_swoole()
+    {
+        if (! extension_loaded('swoole')) {
+            $this->markTestSkipped('Swoole extension is not installed.');
+        }
+
+        $snowflake = new SwooleSequenceResolver();
+        $this->assertEquals(0, $snowflake->sequence(0));
+        $this->assertEquals(1, $snowflake->sequence(0));
+        $this->assertEquals(2, $snowflake->sequence(0));
+        $this->assertEquals(3, $snowflake->sequence(0));
     }
 }

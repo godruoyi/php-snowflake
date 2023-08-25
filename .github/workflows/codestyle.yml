@@ -10,6 +10,16 @@ jobs:
       matrix:
         php-version:
           - 8.2
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -20,7 +30,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           coverage: pcov
           tools: composer:v2
-          extensions: swoole, redis
+          extensions: swoole, redis, pcntl
 
       - name: Install dependencies with composer
         run: composer update --no-ansi --no-interaction --no-progress
@@ -33,6 +43,9 @@ jobs:
 
       - name: Collect code coverage with phpunit
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
+        env:
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
 
       - name: Send code coverage report to Codecov.io
         uses: codecov/codecov-action@v2

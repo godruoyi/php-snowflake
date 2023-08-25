@@ -16,7 +16,7 @@ use Godruoyi\Snowflake\Snowflake;
 
 class TimeTest extends TestCase
 {
-    public function testTime(): void
+    public function test_time(): void
     {
         $s = new Snowflake();
         $a = 0;

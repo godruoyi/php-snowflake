@@ -17,7 +17,7 @@ use Godruoyi\Snowflake\Snowflake;
 
 class RandomSequenceResolverTest extends TestCase
 {
-    public function testBasic(): void
+    public function test_basic(): void
     {
         $random = new RandomSequenceResolver();
         $seqs = [];
@@ -29,7 +29,7 @@ class RandomSequenceResolverTest extends TestCase
         $this->assertCount(Snowflake::MAX_SEQUENCE_SIZE, $seqs);
     }
 
-    public function testCanGenerateUniqueIdBySnowflake(): void
+    public function test_can_generate_unique_id_by_snowflake(): void
     {
         $snowflake = new Snowflake(1, 1);
         $seqs = [];

@@ -17,7 +17,14 @@ use Illuminate\Contracts\Cache\Repository;
 
 class LaravelSequenceResolverTest extends TestCase
 {
-    public function testBasic(): void
+    protected function setUp(): void
+    {
+        if (! interface_exists(Repository::class)) {
+            $this->markTestSkipped('Laravel cache component is not installed.');
+        }
+    }
+
+    public function test_basic(): void
     {
         $mock = $this->createStub(Repository::class);
 
@@ -32,7 +39,7 @@ class LaravelSequenceResolverTest extends TestCase
         $this->assertEquals(0, $laravel->sequence(1));
     }
 
-    public function testSetCachePrefix(): void
+    public function test_set_cache_prefix(): void
     {
         $mock = $this->createStub(Repository::class);
 

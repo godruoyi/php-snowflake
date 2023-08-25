@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Godruoyi\Snowflake\FileLockResolver;
+use Godruoyi\Snowflake\SnowflakeException;
 
 class FileLockResolverTest extends TestCase
 {
@@ -135,6 +136,8 @@ class FileLockResolverTest extends TestCase
         $this->assertTrue($resolver->updateContents(['a' => 'a'], $f));
 
         $this->assertEquals(['a' => 'a'], unserialize(file_get_contents($path)));
+
+        unlink($path);
     }
 
     public function test_get_sequence_file_not_exists(): void
@@ -159,6 +162,8 @@ class FileLockResolverTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage(sprintf('can not open/lock this file %s', $path));
         $this->invokeMethod($resolver, 'getSequence', [$path, $time]);
+
+        unlink($path);
     }
 
     public function test_get_sequence_file_cannot_lock(): void
@@ -176,6 +181,8 @@ class FileLockResolverTest extends TestCase
 
         $this->expectException(\Exception::class);
         $this->invokeMethod($resolver, 'getSequence', [$path, $time]);
+
+        unlink($path);
     }
 
     public function test_get_sequence(): void
@@ -213,6 +220,8 @@ class FileLockResolverTest extends TestCase
         $this->assertTrue($resolver->updateContents(['a' => 2, 'b' => 3], $f));
 
         $this->assertEquals(['a' => 2, 'b' => 3], unserialize(file_get_contents($path)));
+
+        unlink($path);
     }
 
     public function test_fnv(): void
@@ -267,7 +276,7 @@ class FileLockResolverTest extends TestCase
         unlink($path);
     }
 
-    public function test_filePath(): void
+    public function test_file_path(): void
     {
         $resolver = new FileLockResolver;
         $index = 1;
@@ -317,14 +326,46 @@ class FileLockResolverTest extends TestCase
         $this->assertTrue(preg_match('/snowflake-(\d+)\.lock$/', $path) !== false);
     }
 
+    /**
+     * @throws SnowflakeException
+     */
+    public function test_can_clean_lock_file()
+    {
+        FileLockResolver::$shardCount = 1;
+        $fileResolver = new FileLockResolver;
+
+        // this operation will generate a lock file
+        $fileResolver->sequence(1);
+
+        $path = $this->invokeMethod($fileResolver, 'filePath', [0]);
+
+        $this->assertFileExists($path);
+
+        $fileResolver->cleanAllLocksFile();
+
+        $this->assertFileDoesNotExist($path);
+    }
+
     private function touch($content = '')
     {
-        $file = tempnam(sys_get_temp_dir(), 'snowflake');
+        $file = tempnam(dirname(__DIR__).'/.locks', 'snowflake');
 
         if ($content) {
             file_put_contents($file, $content);
         }
 
         return $file;
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        $glob = dirname(__DIR__).'/.locks/*';
+        $files = glob($glob);
+        foreach ($files as $file) {
+            var_dump($file);
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
     }
 }

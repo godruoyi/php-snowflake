@@ -34,5 +34,9 @@
         "psr-4": {
             "Godruoyi\\Snowflake\\": "src"
         }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "pint": "vendor/bin/pint"
     }
 }

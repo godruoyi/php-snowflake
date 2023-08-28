@@ -1,6 +1,8 @@
 name: test
 on:
   pull_request:
+    paths:
+    - "!*.md"
 jobs:
   phptests:
     runs-on: ${{ matrix.operating-system }}

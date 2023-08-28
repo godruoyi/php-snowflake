@@ -68,6 +68,10 @@ class FileLockResolver implements SequenceResolver
         try {
             $f = @fopen($filePath, static::FileOpenMode);
 
+            if (! $f) {
+                throw new SnowflakeException(sprintf('can not open this file %s', $filePath));
+            }
+
             // we always use exclusive lock to avoid the problem of concurrent access.
             // so we don't need to check the return value of flock.
             flock($f, static::FlockLockOperation);
@@ -97,7 +101,7 @@ class FileLockResolver implements SequenceResolver
     /**
      * Unlock and close file.
      *
-     * @param  resource  $f
+     * @param  resource|false|null  $f
      */
     protected function unlock($f): void
     {
@@ -108,7 +112,9 @@ class FileLockResolver implements SequenceResolver
     }
 
     /**
+     * @param  array<int, int>  $contents
      * @param  resource  $f
+     * @return bool
      */
     public function updateContents(array $contents, $f): bool
     {
@@ -119,6 +125,9 @@ class FileLockResolver implements SequenceResolver
     /**
      * Increment sequence with specify time. if current time is not set in the lock file
      * set it to 1, otherwise increment it.
+     *
+     * @param  array<int, int>  $contents
+     * @return array<int, int>
      */
     public function incrementSequenceWithSpecifyTime(array $contents, int $currentTime): array
     {
@@ -129,6 +138,9 @@ class FileLockResolver implements SequenceResolver
 
     /**
      * Clean the old content, we only save the data generated within 10 minutes.
+     *
+     * @param  array<int, int>  $contents
+     * @return array<int, int>
      */
     public function cleanOldSequences(array $contents): array
     {
@@ -148,6 +160,10 @@ class FileLockResolver implements SequenceResolver
     {
         $files = glob($this->lockFileDir.'/*');
 
+        if (! $files) {
+            return;
+        }
+
         foreach ($files as $file) {
             if (is_file($file) && preg_match('/snowflake-(\d+)\.lock$/', $file)) {
                 unlink($file);
@@ -159,6 +175,7 @@ class FileLockResolver implements SequenceResolver
      * Get resource contents, If the contents are invalid json, return null.
      *
      * @param  resource  $f
+     * @return array<int, int>|null
      */
     public function getContents($f): ?array
     {
@@ -255,6 +272,8 @@ class FileLockResolver implements SequenceResolver
      */
     protected function filePath(int $index): string
     {
-        return sprintf('%s%ssnowflake-%s.lock', rtrim($this->lockFileDir, DIRECTORY_SEPARATOR), DIRECTORY_SEPARATOR, $index);
+        $lockFileDir = (string) $this->lockFileDir;
+
+        return sprintf('%s%ssnowflake-%s.lock', rtrim($lockFileDir, DIRECTORY_SEPARATOR), DIRECTORY_SEPARATOR, $index);
     }
 }

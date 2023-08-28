@@ -48,7 +48,7 @@ end
 LUA;
 
         // 10 seconds
-        return $this->redis->eval($lua, [$this->prefix.$currentTime, '0', '10'], 1);
+        return $this->redis->eval($lua, [$this->prefix.$currentTime, '0', '10'], 1) | 0;
     }
 
     /**

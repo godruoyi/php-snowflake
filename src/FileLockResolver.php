@@ -36,7 +36,7 @@ class FileLockResolver implements SequenceResolver
     /**
      * @throws SnowflakeException
      */
-    public function __construct(protected ?string $lockFileDir = null)
+    public function __construct(protected string $lockFileDir)
     {
         $this->lockFileDir = $this->preparePath($lockFileDir);
     }
@@ -214,12 +214,8 @@ class FileLockResolver implements SequenceResolver
      *
      * @throws SnowflakeException
      */
-    protected function preparePath(?string $lockFileDir): string
+    protected function preparePath(string $lockFileDir): string
     {
-        if (empty($lockFileDir)) {
-            $lockFileDir = dirname(__DIR__).'/.locks/';
-        }
-
         if (! is_dir($lockFileDir)) {
             throw new SnowflakeException("{$lockFileDir} is not a directory.");
         }

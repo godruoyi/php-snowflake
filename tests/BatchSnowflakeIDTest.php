@@ -68,7 +68,7 @@ class BatchSnowflakeIDTest extends TestCase
 
     public function test_batch_for_diff_instance_with_file_driver()
     {
-        $fileResolver = new FileLockResolver();
+        $fileResolver = new FileLockResolver(__DIR__);
 
         $this->parallelRun(function () use ($fileResolver) {
             return $fileResolver;

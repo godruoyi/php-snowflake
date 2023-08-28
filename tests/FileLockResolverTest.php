@@ -17,14 +17,25 @@ use Godruoyi\Snowflake\SnowflakeException;
 
 class FileLockResolverTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        [$dir, $defer] = $this->prepareLockPath();
+
+        $this->fileLocker = new FileLockResolver($dir);
+        $this->defer = $defer;
+    }
+
+    protected function tearDown(): void
+    {
+        $defer = $this->defer;
+        $defer();
+    }
+
     public function test_prepare_path(): void
     {
-        $resolver = new FileLockResolver();
-        $this->assertEquals(dirname(__DIR__).'/.locks/', $this->invokeProperty($resolver, 'lockFileDir'));
-
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage(__FILE__.' is not a directory.');
-        $resolver = new FileLockResolver(__FILE__);
+        new FileLockResolver(__FILE__);
     }
 
     public function test_prepare_path_not_writable(): void
@@ -57,15 +68,13 @@ class FileLockResolverTest extends TestCase
 
     public function test_clean_old_sequence(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
 
         $a = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5, 'f' => 6];
         $d = $resolver->cleanOldSequences($a);
-
         $this->assertEquals($a, $d);
 
         FileLockResolver::$maxItems = 3;
-        $resolver = new FileLockResolver;
         $d = $resolver->cleanOldSequences($a);
 
         $this->assertEquals(['d' => 4, 'e' => 5, 'f' => 6], $d);
@@ -73,7 +82,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_increment_sequence_with_specify_time(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
 
         $this->assertEquals(['1' => 1], $resolver->incrementSequenceWithSpecifyTime([], 1));
         $this->assertEquals(['a' => 1, '1' => 1], $resolver->incrementSequenceWithSpecifyTime(['a' => 1], 1));
@@ -83,7 +92,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_get_contents_with_empty(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
 
         $path = $this->touch();
         $f = fopen($path, FileLockResolver::FileOpenMode);
@@ -98,7 +107,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_get_contents_with_serialized_data(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $data = serialize(['a' => 1]);
 
         $path = $this->touch($data);
@@ -114,7 +123,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_get_contents_with_invalid_data(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
 
         $path = $this->touch('{"1":1}');
         $f = fopen($path, FileLockResolver::FileOpenMode);
@@ -129,7 +138,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_update_contents(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $path = $this->touch();
         $f = fopen($path, FileLockResolver::FileOpenMode);
 
@@ -145,7 +154,7 @@ class FileLockResolverTest extends TestCase
         $path = 'a/b/c/d/e/f';
 
         $time = 1;
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
 
         $this->expectException(\Exception::class);
         $this->invokeMethod($resolver, 'getSequence', [$path, $time]);
@@ -157,7 +166,7 @@ class FileLockResolverTest extends TestCase
         chmod($path, 0444);
 
         $time = 1;
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage(sprintf('can not open/lock this file %s', $path));
@@ -177,7 +186,7 @@ class FileLockResolverTest extends TestCase
         $path = $this->touch('x');
         $time = 1;
 
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
 
         $this->expectException(\Exception::class);
         $this->invokeMethod($resolver, 'getSequence', [$path, $time]);
@@ -190,7 +199,7 @@ class FileLockResolverTest extends TestCase
         $path = $this->touch();
         $time = 1;
 
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
 
         $this->invokeMethod($resolver, 'getSequence', [$path, $time]);
         $this->invokeMethod($resolver, 'getSequence', [$path, $time]);
@@ -211,7 +220,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_update_contents_with_content(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $data = ['a' => 1, 'c' => 3];
         $path = $this->touch(serialize($data));
 
@@ -226,7 +235,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_fnv(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $a = $resolver->fnv('1674128900558');
 
         $this->assertSame(455874157.0, $a);
@@ -237,7 +246,7 @@ class FileLockResolverTest extends TestCase
         // reset
         FileLockResolver::$shardCount = 1;
 
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $index = $resolver->getShardLockIndex(1);
         $this->assertTrue($index >= 0 && $index < FileLockResolver::$shardCount);
 
@@ -249,7 +258,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_create_shard_lock_file_with_not_exists_path(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $index = 1;
 
         $path = $this->invokeMethod($resolver, 'createShardLockFile', [$index]);
@@ -261,7 +270,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_create_shard_lock_file_with_exists_path(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $index = 1;
 
         $path = $this->invokeMethod($resolver, 'filePath', [$index]);
@@ -278,7 +287,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_file_path(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $index = 1;
 
         $path = $this->invokeMethod($resolver, 'filePath', [$index]);
@@ -287,7 +296,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_sequence(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $resolver->cleanAllLocksFile();
 
         $this->assertEquals(1, $resolver->sequence(1));
@@ -304,7 +313,7 @@ class FileLockResolverTest extends TestCase
         FileLockResolver::$shardCount = 1;
         FileLockResolver::$maxItems = 3;
 
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $resolver->cleanAllLocksFile();
 
         $this->assertEquals(1, $resolver->sequence(1));
@@ -319,7 +328,7 @@ class FileLockResolverTest extends TestCase
 
     public function test_preg_match(): void
     {
-        $resolver = new FileLockResolver;
+        $resolver = $this->fileLocker;
         $index = 1;
         $path = $this->invokeMethod($resolver, 'filePath', [$index]);
 
@@ -332,7 +341,7 @@ class FileLockResolverTest extends TestCase
     public function test_can_clean_lock_file()
     {
         FileLockResolver::$shardCount = 1;
-        $fileResolver = new FileLockResolver;
+        $fileResolver = $this->fileLocker;
 
         // this operation will generate a lock file
         $fileResolver->sequence(1);
@@ -357,12 +366,21 @@ class FileLockResolverTest extends TestCase
         return $file;
     }
 
+    private function prepareLockPath(): array
+    {
+        $dir = dirname(__DIR__).'/.locks';
+        if (! is_dir($dir)) {
+            mkdir($dir, 0777);
+        }
+
+        return [$dir, fn () => rmdir($dir)];
+    }
+
     public static function tearDownAfterClass(): void
     {
         $glob = dirname(__DIR__).'/.locks/*';
         $files = glob($glob);
         foreach ($files as $file) {
-            var_dump($file);
             if (is_file($file)) {
                 unlink($file);
             }

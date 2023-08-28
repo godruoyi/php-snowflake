@@ -272,8 +272,6 @@ class FileLockResolver implements SequenceResolver
      */
     protected function filePath(int $index): string
     {
-        $lockFileDir = (string) $this->lockFileDir;
-
-        return sprintf('%s%ssnowflake-%s.lock', rtrim($lockFileDir, DIRECTORY_SEPARATOR), DIRECTORY_SEPARATOR, $index);
+        return sprintf('%s%ssnowflake-%s.lock', rtrim($this->lockFileDir, DIRECTORY_SEPARATOR), DIRECTORY_SEPARATOR, $index);
     }
 }

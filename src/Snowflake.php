@@ -41,7 +41,7 @@ class Snowflake
      *
      * @var Closure|SequenceResolver|null
      */
-    protected SequenceResolver|null|Closure $sequence;
+    protected SequenceResolver|null|Closure $sequence = null;
 
     /**
      * The start timestamp.

@@ -38,8 +38,10 @@ class Snowflake
 
     /**
      * The Sequence Resolver instance.
+     *
+     * @var Closure|SequenceResolver|null
      */
-    protected null|Closure|SequenceResolver $sequence = null;
+    protected SequenceResolver|null|Closure $sequence = null;
 
     /**
      * The start timestamp.
@@ -87,6 +89,8 @@ class Snowflake
 
     /**
      * Parse snowflake id.
+     *
+     * @return array<string, float|int|string>
      */
     public function parseId(string $id, bool $transform = false): array
     {
@@ -154,7 +158,7 @@ class Snowflake
     /**
      * Set Sequence Resolver.
      */
-    public function setSequenceResolver(callable|SequenceResolver $sequence): self
+    public function setSequenceResolver(Closure|SequenceResolver $sequence): self
     {
         $this->sequence = $sequence;
 
@@ -180,7 +184,7 @@ class Snowflake
     /**
      * Call resolver.
      */
-    protected function callResolver(mixed $currentTime): int
+    protected function callResolver(int $currentTime): int
     {
         $resolver = $this->getSequenceResolver();
 

@@ -82,8 +82,10 @@ class Sonyflake extends Snowflake
 
     /**
      * Parse snowflake id.
+     *
+     * @return array<string, float|int|string>
      */
-    public function parseId(string $id, $transform = false): array
+    public function parseId(string $id, bool $transform = false): array
     {
         $id = decbin((int) $id);
         $length = self::MAX_SEQUENCE_LENGTH + self::MAX_MACHINEID_LENGTH;

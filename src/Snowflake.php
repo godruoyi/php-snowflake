@@ -14,7 +14,7 @@ namespace Godruoyi\Snowflake;
 
 use Closure;
 
-class Snowflake
+class Snowflake implements IdGenerator
 {
     public const MAX_TIMESTAMP_LENGTH = 41;
 

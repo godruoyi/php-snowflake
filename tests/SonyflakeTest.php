@@ -177,6 +177,7 @@ class SonyflakeTest extends TestCase
             'machineid' => $worker,
         ], $parsed);
         $this->assertEquals($expectedId, $id);
+        $this->assertEquals($expectedTimestamp, $snowflake->toMicrotime((int) $parsed['timestamp']));
     }
 
     public function test_get_default_sequence_resolver(): void
@@ -216,5 +217,17 @@ class SonyflakeTest extends TestCase
         $time = $snowflake->getCurrentMillisecond();
 
         $this->assertTrue($now - $time >= 0);
+    }
+
+    public function test_interpretation_of_timestamps(): void
+    {
+        $startTimestamp = strtotime('2019-08-08 08:08:08') * 1000;
+        $expectedTimestamp = 1577836800000;
+        $timestamp = (int) floor((1577836800000 - $startTimestamp) / 10);
+
+        $snowflake = new Sonyflake(9990);
+        $snowflake->setStartTimeStamp($startTimestamp);
+
+        $this->assertEquals($expectedTimestamp, $snowflake->toMicrotime($timestamp));
     }
 }

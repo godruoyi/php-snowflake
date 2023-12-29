@@ -89,6 +89,14 @@ class Sonyflake extends Snowflake
     }
 
     /**
+     * Calculate the unix timestamp from a given timestamp relative to the start time.
+     */
+    public function toMicrotime(int $timestamp): float|int
+    {
+        return $timestamp * 10 + $this->getStartTimeStamp();
+    }
+
+    /**
      * Set start time (millisecond).
      *
      * @throws SnowflakeException

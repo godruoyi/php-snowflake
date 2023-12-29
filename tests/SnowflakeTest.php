@@ -16,6 +16,7 @@ use Closure;
 use Godruoyi\Snowflake\RandomSequenceResolver;
 use Godruoyi\Snowflake\SequenceResolver;
 use Godruoyi\Snowflake\Snowflake;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SnowflakeTest extends TestCase
 {
@@ -264,5 +265,43 @@ class SnowflakeTest extends TestCase
         });
 
         $this->assertNotEmpty($snowflake->id());
+    }
+
+    public static function timestamps_generator(): \Generator
+    {
+        yield 'DateTime object' => [
+            'timestamp' => new \DateTime('2020-01-01 00:00:00'),
+            'expectedId' => '6617927201583280132',
+            'expectedTimestamp' => 1577836800000,
+        ];
+
+        yield 'Microtime int' => [
+            'timestamp' => 1577836800000,
+            'expectedId' => '6617927201583280132',
+            'expectedTimestamp' => 1577836800000,
+        ];
+    }
+
+    #[DataProvider('timestamps_generator')]
+    public function test_generate_id_for_specified_timestamp(\DateTime|int $timestamp, string $expectedId, int $expectedTimestamp): void
+    {
+        $startTimestamp = 1;
+        $datacenter = 2;
+        $worker = 3;
+        $sequence = 4;
+
+        $snowflake = new Snowflake($datacenter, $worker);
+        $snowflake->setStartTimeStamp($startTimestamp);
+        $snowflake->setSequenceResolver(fn () => $sequence);
+
+        $id = $snowflake->idFor($timestamp);
+        $parsed = $snowflake->parseId($id, true);
+        $this->assertEquals([
+            'timestamp' => $expectedTimestamp - $startTimestamp,
+            'sequence' => $sequence,
+            'workerid' => $worker,
+            'datacenter' => $datacenter,
+        ], $parsed);
+        $this->assertEquals($expectedId, $id);
     }
 }

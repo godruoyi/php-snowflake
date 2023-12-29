@@ -88,6 +88,34 @@ class Snowflake
     }
 
     /**
+     * Get snowflake id for specific timestamp.
+     *
+     * @throws SnowflakeException
+     */
+    public function idFor(\DateTime|int $timestamp): string
+    {
+        $currentTime = $timestamp instanceof \DateTime ? (int) $timestamp->format('Uv') : $timestamp;
+
+        $missTime = $currentTime - $this->getStartTimeStamp();
+        if ($missTime < 0) {
+            throw new SnowflakeException('The timestamp cannot be greater than the start time');
+        }
+
+        while (($sequence = $this->callResolver($currentTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
+            $currentTime++;
+        }
+
+        $workerLeftMoveLength = self::MAX_SEQUENCE_LENGTH;
+        $datacenterLeftMoveLength = self::MAX_WORKID_LENGTH + $workerLeftMoveLength;
+        $timestampLeftMoveLength = self::MAX_DATACENTER_LENGTH + $datacenterLeftMoveLength;
+
+        return (string) ((($currentTime - $this->getStartTimeStamp()) << $timestampLeftMoveLength)
+            | ($this->datacenter << $datacenterLeftMoveLength)
+            | ($this->workerId << $workerLeftMoveLength)
+            | ($sequence));
+    }
+
+    /**
      * Parse snowflake id.
      *
      * @return array<string, float|int|string>

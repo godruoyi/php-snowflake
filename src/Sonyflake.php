@@ -62,6 +62,33 @@ class Sonyflake extends Snowflake
     }
 
     /**
+     * Get Sonyflake id for specific timestamp.
+     *
+     * @throws SnowflakeException
+     */
+    public function idFor(\DateTime|int $timestamp): string
+    {
+        $currentTime = $timestamp instanceof \DateTime ? (int) $timestamp->format('Uv') : $timestamp;
+
+        $missTime = $currentTime - $this->getStartTimeStamp();
+        if ($missTime < 0) {
+            throw new SnowflakeException('The timestamp cannot be greater than the start time');
+        }
+
+        $elapsedTime = floor(($currentTime - $this->getStartTimeStamp()) / 10) | 0;
+
+        while (($sequence = $this->callResolver($elapsedTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
+            $elapsedTime++;
+        }
+
+        $this->ensureEffectiveRuntime($elapsedTime);
+
+        return (string) ($elapsedTime << (self::MAX_MACHINEID_LENGTH + self::MAX_SEQUENCE_LENGTH)
+            | ($this->machineId << self::MAX_SEQUENCE_LENGTH)
+            | ($sequence));
+    }
+
+    /**
      * Set start time (millisecond).
      *
      * @throws SnowflakeException

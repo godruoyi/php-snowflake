@@ -7,8 +7,6 @@ on:
       - master
       - '*.x'
   pull_request:
-    paths:
-    - "!*.md"
 
 permissions:
   contents: read

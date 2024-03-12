@@ -20,9 +20,6 @@ final class Parallel
     /**
      * Run specified callback in parallel.
      *
-     * @param  callable  $callback
-     * @param  int  $parallel
-     * @return array
      *
      * @throws RuntimeException|Throwable
      */
@@ -87,9 +84,6 @@ final class Parallel
 
     /**
      * Create pipelines with specified number, will fire a exception if failed.
-     *
-     * @param  int  $parallel
-     * @return array
      */
     private static function createPipelines(int $parallel = 100): array
     {

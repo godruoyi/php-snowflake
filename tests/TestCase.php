@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use ReflectionException;
 
 class TestCase extends BaseTestCase
 {
@@ -23,6 +24,8 @@ class TestCase extends BaseTestCase
      * @param  string  $methodName  Method name to call
      * @param  array  $parameters  Array of parameters to pass into method.
      * @return mixed Method return.
+     *
+     * @throws ReflectionException
      */
     public function invokeMethod(&$object, $methodName, array $parameters = [])
     {
@@ -39,6 +42,8 @@ class TestCase extends BaseTestCase
      * @param  object  &$object  Instantiated object that we will run method on.
      * @param  string  $propertyName  property name to call
      * @return mixed Method return.
+     *
+     * @throws ReflectionException
      */
     public function invokeProperty(&$object, string $propertyName)
     {

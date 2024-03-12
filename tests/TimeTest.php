@@ -28,7 +28,8 @@ class TimeTest extends TestCase
                 $s2 = $s->getCurrentMillisecond();
             }
             $a++;
-            $this->assertTrue($s1 != $s2);
+
+            $this->assertEquals($s1, $s2);
         }
     }
 }

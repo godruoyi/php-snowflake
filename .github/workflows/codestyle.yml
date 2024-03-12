@@ -1,8 +1,6 @@
 name: codestyle
 on:
   pull_request:
-    paths:
-    - "!*.md"
   workflow_dispatch:
 jobs:
   code-coverage:

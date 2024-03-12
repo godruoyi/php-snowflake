@@ -87,7 +87,7 @@ class SonyflakeTest extends TestCase
         $this->assertArrayHasKey('sequence', $dumps);
         $this->assertArrayHasKey('machineid', $dumps);
         $this->assertArrayHasKey('timestamp', $dumps);
-        $this->assertTrue(110 == $dumps['machineid']);
+        $this->assertTrue($dumps['machineid'] == 110);
     }
 
     public function test_id(): void
@@ -102,7 +102,7 @@ class SonyflakeTest extends TestCase
             // $this->assertArrayNotHasKey($id, $datas);
             $datas[$id] = 1;
         }
-        $this->assertTrue(10000 === count($datas));
+        $this->assertTrue(count($datas) === 10000);
     }
 
     /**
@@ -169,7 +169,7 @@ class SonyflakeTest extends TestCase
         $this->assertTrue($snowflake->getStartTimeStamp() === (strtotime($defaultTime) * 1000));
 
         $snowflake->setStartTimeStamp(1);
-        $this->assertTrue(1 === $snowflake->getStartTimeStamp());
+        $this->assertTrue($snowflake->getStartTimeStamp() === 1);
     }
 
     public function testget_current_millisecond(): void

@@ -36,6 +36,6 @@ class DiffWorkIdBatchTest extends TestCase
             $ids[$id] = 1;
         }
 
-        $this->assertTrue(20000 === count($ids));
+        $this->assertTrue(count($ids) === 20000);
     }
 }

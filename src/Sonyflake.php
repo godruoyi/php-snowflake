@@ -25,7 +25,7 @@ class Sonyflake extends Snowflake
     /**
      * Build Sonyflake Instance.
      *
-     * @param  int  $machineId machine ID 0 ~ 65535 (2^16)-1
+     * @param  int  $machineId  machine ID 0 ~ 65535 (2^16)-1
      */
     public function __construct(protected int $machineId = 0)
     {

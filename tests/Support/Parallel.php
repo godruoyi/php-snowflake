@@ -20,9 +20,6 @@ final class Parallel
     /**
      * Run specified callback in parallel.
      *
-     * @param  callable  $callback
-     * @param  int  $parallel
-     * @return array
      *
      * @throws RuntimeException|Throwable
      */
@@ -46,8 +43,8 @@ final class Parallel
     /**
      * Creates child processes to execute a callback function in parallel.
      *
-     * @param  callable  $callback The callback function to execute in each child process.
-     * @param  int  $parallel The number of child processes to create (default: 100).
+     * @param  callable  $callback  The callback function to execute in each child process.
+     * @param  int  $parallel  The number of child processes to create (default: 100).
      * @return array An array of child process information, including the process ID and the pipe.
      *
      * @throws RuntimeException If a child process cannot be created.
@@ -87,9 +84,6 @@ final class Parallel
 
     /**
      * Create pipelines with specified number, will fire a exception if failed.
-     *
-     * @param  int  $parallel
-     * @return array
      */
     private static function createPipelines(int $parallel = 100): array
     {

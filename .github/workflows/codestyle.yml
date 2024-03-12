@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
     - "!*.md"
+  workflow_dispatch:
 jobs:
   code-coverage:
     name: Code Coverage

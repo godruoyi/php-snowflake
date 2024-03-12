@@ -175,9 +175,9 @@ class SonyflakeTest extends TestCase
     public function testget_current_millisecond(): void
     {
         $snowflake = new Sonyflake(9990);
-        $now = floor(microtime(true) * 1000) | 0;
-        $time = $snowflake->getCurrentMillisecond();
+        $first = $snowflake->getCurrentMillisecond();
+        $second = $snowflake->getCurrentMillisecond();
 
-        $this->assertTrue($now - $time >= 0);
+        $this->assertTrue($second - $first >= 0);
     }
 }

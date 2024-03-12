@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Godruoyi\Snowflake\RedisSequenceResolver;
+use Godruoyi\Snowflake\Snowflake;
 use RedisException;
 
 class RedisSequenceResolverTest extends TestCase
@@ -75,15 +76,19 @@ class RedisSequenceResolverTest extends TestCase
         $redis = new \Redis();
         $redis->connect($host, $port | 0);
 
+        // Sometimes running these tests in parallel on Github may cause unexpected errors,
+        // so we change to use random here.
+        $key = (new Snowflake())->getCurrentMillisecond();
+
         $redisResolver = new RedisSequenceResolver($redis);
 
-        $this->assertEquals(0, $redisResolver->sequence(1));
-        $this->assertEquals(1, $redisResolver->sequence(1));
-        $this->assertEquals(2, $redisResolver->sequence(1));
-        $this->assertEquals(3, $redisResolver->sequence(1));
+        $this->assertEquals(0, $redisResolver->sequence($key));
+        $this->assertEquals(1, $redisResolver->sequence($key));
+        $this->assertEquals(2, $redisResolver->sequence($key));
+        $this->assertEquals(3, $redisResolver->sequence($key));
 
         sleep(10);
 
-        $this->assertEquals(0, $redisResolver->sequence(1));
+        $this->assertEquals(0, $redisResolver->sequence($key));
     }
 }

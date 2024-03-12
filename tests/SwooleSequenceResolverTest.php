@@ -21,6 +21,10 @@ class SwooleSequenceResolverTest extends TestCase
         if (version_compare(PHP_VERSION, '8.3') >= 0) {
             $this->markTestSkipped('Swoole does not yet support PHP 8.3');
         }
+
+        if (! extension_loaded('swoole')) {
+            $this->markTestSkipped('Swoole extension is not installed');
+        }
     }
 
     public function test_basic(): void

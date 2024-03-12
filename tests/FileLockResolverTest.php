@@ -369,9 +369,8 @@ class FileLockResolverTest extends TestCase
     private function prepareLockPath(): array
     {
         $dir = dirname(__DIR__).'/.locks';
-        if (! is_dir($dir)) {
-            mkdir($dir, 0777);
-        }
+        rmdir($dir);
+        mkdir($dir, 0777);
 
         return [$dir, fn () => rmdir($dir)];
     }

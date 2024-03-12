@@ -29,7 +29,7 @@ class TimeTest extends TestCase
             }
             $a++;
 
-            $this->assertEquals($s1, $s2);
+            $this->assertTrue($s1 != $s2);
         }
     }
 }

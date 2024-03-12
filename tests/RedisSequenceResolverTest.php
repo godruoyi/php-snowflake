@@ -35,10 +35,10 @@ class RedisSequenceResolverTest extends TestCase
 
         $snowflake = new RedisSequenceResolver($redis);
 
-        $this->assertTrue(0 == $snowflake->sequence(1));
-        $this->assertTrue(1 == $snowflake->sequence(1));
-        $this->assertTrue(2 == $snowflake->sequence(1));
-        $this->assertTrue(3 == $snowflake->sequence(1));
+        $this->assertTrue($snowflake->sequence(1) == 0);
+        $this->assertTrue($snowflake->sequence(1) == 1);
+        $this->assertTrue($snowflake->sequence(1) == 2);
+        $this->assertTrue($snowflake->sequence(1) == 3);
     }
 
     public function test_set_cache_prefix(): void

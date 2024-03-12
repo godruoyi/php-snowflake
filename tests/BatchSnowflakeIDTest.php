@@ -81,8 +81,8 @@ class BatchSnowflakeIDTest extends TestCase
      * Runs the given function in parallel using the specified number of processes.
      *
      * @param  callable  $resolver
-     * @param  int  $parallel The number of processes to run in parallel.
-     * @param  int  $count The number of times to run the function.
+     * @param  int  $parallel  The number of processes to run in parallel.
+     * @param  int  $count  The number of times to run the function.
      * @return void
      *
      * @throws Throwable
@@ -108,9 +108,9 @@ class BatchSnowflakeIDTest extends TestCase
     /**
      * Asserts the results of a parallel execution.
      *
-     * @param  array  $results The array of results.
-     * @param  int  $parallel The number of parallel executions.
-     * @param  int  $count The expected count for each execution.
+     * @param  array  $results  The array of results.
+     * @param  int  $parallel  The number of parallel executions.
+     * @param  int  $count  The expected count for each execution.
      * @return void
      */
     private function assertResults(array $results, int $parallel, int $count): void

@@ -66,14 +66,14 @@ class SnowflakeTest extends TestCase
         $this->assertTrue(! empty($snowflake->id()));
         $this->assertTrue(strlen($id = $snowflake->id()) <= 19);
 
-        $this->assertTrue(1 === $snowflake->parseId($id, true)['datacenter']);
-        $this->assertTrue(2 === $snowflake->parseId($id, true)['workerid']);
+        $this->assertTrue($snowflake->parseId($id, true)['datacenter'] === 1);
+        $this->assertTrue($snowflake->parseId($id, true)['workerid'] === 2);
 
         $snowflake = new Snowflake(999, 20);
         $id = $snowflake->id();
 
-        $this->assertTrue(999 !== $snowflake->parseId($id, true)['datacenter']);
-        $this->assertTrue(20 === $snowflake->parseId($id, true)['workerid']);
+        $this->assertTrue($snowflake->parseId($id, true)['datacenter'] !== 999);
+        $this->assertTrue($snowflake->parseId($id, true)['workerid'] === 20);
     }
 
     public function test_extends(): void
@@ -85,9 +85,9 @@ class SnowflakeTest extends TestCase
 
         $id = $snowflake->id();
 
-        $this->assertTrue(999 !== $snowflake->parseId($id, true)['datacenter']);
-        $this->assertTrue(999 === $snowflake->parseId($id, true)['sequence']);
-        $this->assertTrue(20 === $snowflake->parseId($id, true)['workerid']);
+        $this->assertTrue($snowflake->parseId($id, true)['datacenter'] !== 999);
+        $this->assertTrue($snowflake->parseId($id, true)['sequence'] === 999);
+        $this->assertTrue($snowflake->parseId($id, true)['workerid'] === 20);
     }
 
     public function test_batch(): void
@@ -116,7 +116,7 @@ class SnowflakeTest extends TestCase
             $datas[$id] = 1;
         }
 
-        $this->assertTrue(10000 === count($datas));
+        $this->assertTrue(count($datas) === 10000);
     }
 
     public function test_parse_id(): void
@@ -130,21 +130,21 @@ class SnowflakeTest extends TestCase
 
         $data = $snowflake->parseId('1537200202186752', true);
 
-        $this->assertTrue(0 === $data['workerid']);
-        $this->assertTrue(0 === $data['datacenter']);
-        $this->assertTrue(0 === $data['sequence']);
+        $this->assertTrue($data['workerid'] === 0);
+        $this->assertTrue($data['datacenter'] === 0);
+        $this->assertTrue($data['sequence'] === 0);
         $this->assertTrue($data['timestamp'] > 0);
 
         $snowflake = new Snowflake(2, 3);
         $id = $snowflake->id();
         $payloads = $snowflake->parseId($id, true);
 
-        $this->assertTrue(2 === $payloads['datacenter']);
-        $this->assertTrue(3 === $payloads['workerid']);
+        $this->assertTrue($payloads['datacenter'] === 2);
+        $this->assertTrue($payloads['workerid'] === 3);
         $this->assertLessThan(Snowflake::MAX_SEQUENCE_SIZE, $payloads['sequence']);
 
         $payloads = $snowflake->parseId('0');
-        $this->assertTrue('' == $payloads['timestamp'] || false == $payloads['timestamp']);
+        $this->assertTrue($payloads['timestamp'] == '' || $payloads['timestamp'] == false);
         $this->assertSame($payloads['workerid'], '0');
         $this->assertSame($payloads['datacenter'], '0');
         $this->assertSame($payloads['sequence'], '0');
@@ -164,7 +164,7 @@ class SnowflakeTest extends TestCase
         $snowflake = new Snowflake(999, 20);
 
         $snowflake->setStartTimeStamp(1);
-        $this->assertTrue(1 === $snowflake->getStartTimeStamp());
+        $this->assertTrue($snowflake->getStartTimeStamp() === 1);
     }
 
     public function test_set_start_time_stamp_max_value_is_over(): void
@@ -193,7 +193,7 @@ class SnowflakeTest extends TestCase
         $this->assertTrue($snowflake->getStartTimeStamp() === (strtotime($defaultTime) * 1000));
 
         $snowflake->setStartTimeStamp(1);
-        $this->assertTrue(1 === $snowflake->getStartTimeStamp());
+        $this->assertTrue($snowflake->getStartTimeStamp() === 1);
     }
 
     public function testcall_resolver(): void
@@ -207,7 +207,7 @@ class SnowflakeTest extends TestCase
         $seq = $snowflake->getSequenceResolver();
 
         $this->assertTrue($seq instanceof Closure);
-        $this->assertTrue(999 === $seq(0));
+        $this->assertTrue($seq(0) === 999);
     }
 
     public function test_get_sequence_resolver(): void

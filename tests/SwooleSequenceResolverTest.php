@@ -27,14 +27,14 @@ class SwooleSequenceResolverTest extends TestCase
     {
         $snowflake = new SwooleSequenceResolver();
 
-        $this->assertTrue(0 == $snowflake->sequence(0));
-        $this->assertTrue(1 == $snowflake->sequence(0));
-        $this->assertTrue(2 == $snowflake->sequence(0));
-        $this->assertTrue(3 == $snowflake->sequence(0));
+        $this->assertTrue($snowflake->sequence(0) == 0);
+        $this->assertTrue($snowflake->sequence(0) == 1);
+        $this->assertTrue($snowflake->sequence(0) == 2);
+        $this->assertTrue($snowflake->sequence(0) == 3);
 
-        $this->assertTrue(0 == $snowflake->sequence(1));
-        $this->assertTrue(1 == $snowflake->sequence(1));
-        $this->assertTrue(2 == $snowflake->sequence(1));
+        $this->assertTrue($snowflake->sequence(1) == 0);
+        $this->assertTrue($snowflake->sequence(1) == 1);
+        $this->assertTrue($snowflake->sequence(1) == 2);
     }
 
     public function test_reset_lock(): void

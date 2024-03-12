@@ -46,8 +46,8 @@ final class Parallel
     /**
      * Creates child processes to execute a callback function in parallel.
      *
-     * @param  callable  $callback The callback function to execute in each child process.
-     * @param  int  $parallel The number of child processes to create (default: 100).
+     * @param  callable  $callback  The callback function to execute in each child process.
+     * @param  int  $parallel  The number of child processes to create (default: 100).
      * @return array An array of child process information, including the process ID and the pipe.
      *
      * @throws RuntimeException If a child process cannot be created.

@@ -16,6 +16,7 @@ use Exception;
 use Godruoyi\Snowflake\RandomSequenceResolver;
 use Godruoyi\Snowflake\SequenceResolver;
 use Godruoyi\Snowflake\Sonyflake;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionException;
 
 class SonyflakeTest extends TestCase
@@ -142,6 +143,43 @@ class SonyflakeTest extends TestCase
         $this->assertNotEmpty($snowflake->id());
     }
 
+    public static function timestamps_generator(): \Generator
+    {
+        yield 'DateTime object' => [
+            'timestamp' => new \DateTime('2020-01-01 00:00:00'),
+            'expectedId' => '2647170880618103556',
+            'expectedTimestamp' => 1577836800000,
+        ];
+
+        yield 'Microtime int' => [
+            'timestamp' => 1577836800000,
+            'expectedId' => '2647170880618103556',
+            'expectedTimestamp' => 1577836800000,
+        ];
+    }
+
+    #[DataProvider('timestamps_generator')]
+    public function test_generate_id_for_specified_timestamp(\DateTime|int $timestamp, string $expectedId, int $expectedTimestamp): void
+    {
+        $startTimestamp = 1;
+        $worker = 3;
+        $sequence = 4;
+
+        $snowflake = new Sonyflake($worker);
+        $snowflake->setStartTimeStamp($startTimestamp);
+        $snowflake->setSequenceResolver(fn () => $sequence);
+
+        $id = $snowflake->idFor($timestamp);
+        $parsed = $snowflake->parseId($id, true);
+        $this->assertEquals([
+            'timestamp' => (int) floor(($expectedTimestamp - $startTimestamp) / 10),
+            'sequence' => $sequence,
+            'machineid' => $worker,
+        ], $parsed);
+        $this->assertEquals($expectedId, $id);
+        $this->assertEquals($expectedTimestamp, $snowflake->toMicrotime((int) $parsed['timestamp']));
+    }
+
     public function test_get_default_sequence_resolver(): void
     {
         $snowflake = new Sonyflake(1);
@@ -179,5 +217,17 @@ class SonyflakeTest extends TestCase
         $second = $snowflake->getCurrentMillisecond();
 
         $this->assertTrue($second - $first >= 0);
+    }
+
+    public function test_interpretation_of_timestamps(): void
+    {
+        $startTimestamp = strtotime('2019-08-08 08:08:08') * 1000;
+        $expectedTimestamp = 1577836800000;
+        $timestamp = (int) floor((1577836800000 - $startTimestamp) / 10);
+
+        $snowflake = new Sonyflake(9990);
+        $snowflake->setStartTimeStamp($startTimestamp);
+
+        $this->assertEquals($expectedTimestamp, $snowflake->toMicrotime($timestamp));
     }
 }

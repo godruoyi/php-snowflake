@@ -13,8 +13,10 @@ declare(strict_types=1);
 namespace Tests;
 
 use Godruoyi\Snowflake\FileLockResolver;
+use Godruoyi\Snowflake\PHPRedisSequenceResolver;
 use Godruoyi\Snowflake\RedisSequenceResolver;
 use Godruoyi\Snowflake\Snowflake;
+use Predis\Client;
 use Throwable;
 
 class BatchSnowflakeIDTest extends TestCase
@@ -66,6 +68,34 @@ class BatchSnowflakeIDTest extends TestCase
             $redis->connect(getenv('REDIS_HOST'), getenv('REDIS_PORT') | 0);
 
             return new RedisSequenceResolver($redis);
+        }, 100, 1000);
+
+        // Should generate 100k unique IDs
+        $this->assertResults($results, 100, 1000);
+    }
+
+    public function test_batch_for_diff_instance_with_predis_driver()
+    {
+        if (! class_exists('Predis\\Client')
+            || ! getenv('REDIS_HOST')
+            || ! getenv('REDIS_PORT')) {
+            $this->markTestSkipped('Redis extension is not installed or not configured.');
+        }
+
+        if (! extension_loaded('pcntl')) {
+            $this->markTestSkipped('The pcntl extension is not installed.');
+        }
+
+        $results = $this->parallelRun(function () {
+            $client = new Client([
+                'scheme' => 'tcp',
+                'host' => getenv('REDIS_HOST'),
+                'port' => getenv('REDIS_PORT') | 0,
+            ]);
+
+            $client->ping();
+
+            return new PHPRedisSequenceResolver($client);
         }, 100, 1000);
 
         // Should generate 100k unique IDs

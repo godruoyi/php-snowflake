@@ -18,13 +18,6 @@ use RedisException;
 
 class RedisSequenceResolverTest extends TestCase
 {
-    public function setUp(): void
-    {
-        if (! extension_loaded('swoole')) {
-            $this->markTestSkipped('Redis extension is not installed');
-        }
-    }
-
     public function test_invalid_redis_connect(): void
     {
         $redis = $this->createMock(\Redis::class);

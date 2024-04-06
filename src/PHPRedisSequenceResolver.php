@@ -12,10 +12,9 @@ declare(strict_types=1);
 
 namespace Godruoyi\Snowflake;
 
-use Redis;
-use RedisException;
+use Predis\Client as PredisClient;
 
-class RedisSequenceResolver implements SequenceResolver
+class PHPRedisSequenceResolver implements SequenceResolver
 {
     /**
      * The cache prefix.
@@ -33,25 +32,13 @@ else
 end
 LUA;
 
-    /**
-     * Init resolve instance, must be connected.
-     *
-     * @throws RedisException
-     */
-    public function __construct(protected Redis $redis)
+    public function __construct(protected PredisClient $predisClient)
     {
-        if (! $redis->ping()) {
-            throw new RedisException('Redis server went away');
-        }
     }
 
-    /**
-     * @throws RedisException
-     */
     public function sequence(int $currentTime): int
     {
-        // 10 seconds
-        return $this->redis->eval(self::$script, [$this->prefix.$currentTime, '0', '10'], 1) | 0;
+        return $this->predisClient->eval(self::$script, 1, $this->prefix.$currentTime, '0', '10') | 0;
     }
 
     /**

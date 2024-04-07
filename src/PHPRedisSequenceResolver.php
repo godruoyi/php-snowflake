@@ -25,12 +25,12 @@ class PHPRedisSequenceResolver implements SequenceResolver
      * The default redis lua script
      */
     protected static string $script = <<<'LUA'
-if redis.call('set', KEYS[1], ARGV[1], "EX", ARGV[2], "NX") then
-    return 0
-else
-    return redis.call('incr', KEYS[1])
-end
-LUA;
+        if redis.call('set', KEYS[1], ARGV[1], "EX", ARGV[2], "NX") then
+            return 0
+        else
+            return redis.call('incr', KEYS[1])
+        end
+        LUA;
 
     public function __construct(protected PredisClient $predisClient)
     {

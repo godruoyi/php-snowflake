@@ -39,7 +39,7 @@
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
-        "pint": "vendor/bin/pint --config ./pint.json"
+        "pint": "vendor/bin/pint --config pint.json"
     },
     "config": {
         "allow-plugins": {

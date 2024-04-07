@@ -14,7 +14,7 @@ namespace Godruoyi\Snowflake;
 
 use Predis\Client as PredisClient;
 
-class PHPRedisSequenceResolver implements SequenceResolver
+class PredisSequenceResolver implements SequenceResolver
 {
     /**
      * The cache prefix.

@@ -12,12 +12,12 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Godruoyi\Snowflake\PHPRedisSequenceResolver;
+use Godruoyi\Snowflake\PredisSequenceResolver;
 use PHPUnit\Framework\MockObject\Exception;
 use Predis\Client;
 use ReflectionException;
 
-class PHPRedisSequenceResolverTest extends TestCase
+class PredisSequenceResolverTest extends TestCase
 {
     public function setUp(): void
     {
@@ -33,7 +33,7 @@ class PHPRedisSequenceResolverTest extends TestCase
     public function test_set_cache_prefix(): void
     {
         $redis = $this->createMock(Client::class);
-        $snowflake = new PHPRedisSequenceResolver($redis);
+        $snowflake = new PredisSequenceResolver($redis);
         $snowflake->setCachePrefix('foo');
 
         $this->assertEquals('foo', $this->invokeProperty($snowflake, 'prefix'));
@@ -52,7 +52,7 @@ class PHPRedisSequenceResolverTest extends TestCase
             ->withAnyParameters()
             ->willReturn(1, 2, 3, 4);
 
-        $snowflake = new PHPRedisSequenceResolver($redis);
+        $snowflake = new PredisSequenceResolver($redis);
 
         $this->assertEquals(1, $snowflake->sequence(1));
         $this->assertEquals(2, $snowflake->sequence(1));
@@ -76,7 +76,7 @@ class PHPRedisSequenceResolverTest extends TestCase
 
         $randomKey = random_int(0, 99999);
 
-        $redisResolver = new PHPRedisSequenceResolver($client);
+        $redisResolver = new PredisSequenceResolver($client);
 
         $this->assertEquals(0, $redisResolver->sequence($randomKey));
         $this->assertEquals(1, $redisResolver->sequence($randomKey));

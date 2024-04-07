@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Godruoyi\Snowflake\FileLockResolver;
-use Godruoyi\Snowflake\PHPRedisSequenceResolver;
+use Godruoyi\Snowflake\PredisSequenceResolver;
 use Godruoyi\Snowflake\RedisSequenceResolver;
 use Godruoyi\Snowflake\Snowflake;
 use Predis\Client;
@@ -95,7 +95,7 @@ class BatchSnowflakeIDTest extends TestCase
 
             $client->ping();
 
-            return new PHPRedisSequenceResolver($client);
+            return new PredisSequenceResolver($client);
         }, 100, 1000);
 
         // Should generate 100k unique IDs

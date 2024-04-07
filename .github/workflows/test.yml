@@ -40,6 +40,9 @@ jobs:
     - name: Install Laravel Illuminate Contracts
       run: composer require "illuminate/contracts"
 
+    - name: Install Predis Package
+      run: composer require "predis/predis:^2.0"
+
     - name: PHPUnit Test
       run: vendor/bin/phpunit --display-incomplete --display-skipped --display-deprecations --display-errors --display-notices --display-warnings
       env:

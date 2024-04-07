@@ -46,7 +46,7 @@ Based on this, we created this package and integrated multiple sequence-number p
 * RandomSequenceResolver (Random)
 * FileLockResolver（PHP file lock `fopen/flock`, **Concurrency Safety**）
 * RedisSequenceResolver (based on redis psetex and incrby, **Concurrency Safety**)
-* LaravelSequenceResolver (based on Laravel Cache `add` lock)
+* LaravelSequenceResolver (based on Laravel Cache [add](https://github.com/laravel/framework/blob/11.x/src/Illuminate/Contracts/Cache/Repository.php#L39) lock)
 * SwooleSequenceResolver (based on swoole_lock)
 * PredisSequenceResolver (based on redis psetex and incrby, **Concurrency Safety**)
 

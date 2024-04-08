@@ -35,14 +35,12 @@ Snowflake is a network service that generates unique ID numbers at high scale wi
 3. The third and fourth parts are represented by 5 bits each, indicating the data centerID and workerID. The maximum value for both is 31 (2^5 -1).
 4. The last part consists of 12 bits, which represents the length of the serial number generated per millisecond per working node. A maximum of 4095 IDs can be generated in the same millisecond (2^12 -1).
 
-> With a binary length of 41 bits, it can represent up to 69 years' worth of milliseconds (2^41 -1). Therefore, the snowflake algorithm can be used for up to 69 years. To maximize its use, it's recommended to specify a start time.
-
 If you want to generate unique IDs using the snowflake algorithm, you must ensure that sequence numbers generated within the same millisecond on the same node are unique.
 Based on this requirement, we have created this package which integrates multiple sequence number providers.
 
 * RandomSequenceResolver (Random Sequence Number, UnSafe)
 * FileLockResolver (Uses PHP file lock `fopen/flock`, **Concurrency Safety**)
-* RedisSequenceResolver (Redis psetex and incrby, **concurrency safety**)
+* RedisSequenceResolver (Redis psetex and incrby, **Concurrency safety**)
 * PredisSequenceResolver (redis psetex and incrby, **Concurrency Safety**)
 * LaravelSequenceResolver (Laravel Cache [add](https://github.com/laravel/framework/blob/11.x/src/Illuminate/Contracts/Cache/Repository.php#L39) lock mechanism)
 * SwooleSequenceResolver (swoole_lock for **Concurrency Safety**)
@@ -95,6 +93,8 @@ $snowflake->setStartTimeStamp(strtotime('2019-09-09')*1000); // millisecond
 $snowflake->id();
 ```
 
+> The maximum value of a 41-bit timestamp (in milliseconds) can represent up to 69 years, so the Snowflake algorithm can run safely for 69 years. In order to make the most of it, we recommend setting a start time.
+
 4. Use Sonyflake
 
 ```php
@@ -106,7 +106,7 @@ $sonyflake->id();
 
 1. Used in Laravel.
 
-Because the SDK is relatively simple, we don't provide an extension for Laravel. You can quickly integrate it into Laravel in the following way.
+Since the SDK is quite straightforward, we do not offer a specific extension for Laravel. However, you can easily integrate it into your Laravel project by following these steps.
 
 ```php
 // App\Providers\AppServiceProvider
@@ -134,7 +134,7 @@ class AppServiceProvider extends ServiceProvider
 
 2. Custom
 
-You can customize the sequence-number resolver by implementing the Godruoyi\Snowflake\SequenceResolver interface.
+To customize the sequence number resolver, you need to implement the Godruoyi\Snowflake\SequenceResolver interface.
 
 ```php
 class YourSequence implements SequenceResolver
@@ -155,7 +155,7 @@ $snowflake->setSequenceResolver(new YourSequence);
 $snowflake->id();
 ```
 
-And you can use closure:
+And you also can use the Closure:
 
 ```php
 $snowflake = new \Godruoyi\Snowflake\Snowflake;

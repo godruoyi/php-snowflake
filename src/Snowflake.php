@@ -38,8 +38,6 @@ class Snowflake
 
     /**
      * The Sequence Resolver instance.
-     *
-     * @var Closure|SequenceResolver|null
      */
     protected SequenceResolver|null|Closure $sequence = null;
 

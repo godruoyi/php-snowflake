@@ -114,7 +114,6 @@ class FileLockResolver implements SequenceResolver
     /**
      * @param  array<int, int>  $contents
      * @param  resource  $f
-     * @return bool
      */
     public function updateContents(array $contents, $f): bool
     {

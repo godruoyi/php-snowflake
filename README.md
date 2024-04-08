@@ -46,10 +46,22 @@ Based on this, we created this package and integrated multiple sequence-number p
 * RandomSequenceResolver (Random)
 * FileLockResolver（PHP file lock `fopen/flock`, **Concurrency Safety**）
 * RedisSequenceResolver (based on redis psetex and incrby, **Concurrency Safety**)
-* LaravelSequenceResolver (based on redis psetex and incrby)
+* LaravelSequenceResolver (based on Laravel Cache [add](https://github.com/laravel/framework/blob/11.x/src/Illuminate/Contracts/Cache/Repository.php#L39) lock)
 * SwooleSequenceResolver (based on swoole_lock)
+* PredisSequenceResolver (based on redis psetex and incrby, **Concurrency Safety**)
 
 Each provider only needs to ensure that the serial number generated in the same millisecond is different. You can get a unique ID.
+
+
+> [!NOTE]  
+> If you want to use RedisSequenceResolver, please install the [redis](https://pecl.php.net/package/redis) extension:
+> pecl install redis
+> 
+> If you want to use SwooleSequenceResolver, please install the swoole extension:
+> pecl install swoole
+> 
+> If you want to use PredisSequenceResolver, please install the [predis/predis](https://github.com/predis/predis) package:
+> composer install predis/predis
 
 > **Warning**
 > The RandomSequenceResolver does not guarantee that the generated IDs are unique, If you want to generate a unique ID, please use another resolver instead.

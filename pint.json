@@ -7,6 +7,9 @@
         "php_unit_method_casing": {
             "case": "snake_case"
         },
-        "no_superfluous_phpdoc_tags": false
+        "no_superfluous_phpdoc_tags": false,
+        "heredoc_indentation": {
+            "indentation": "start_plus_one"
+        }
     }
 }

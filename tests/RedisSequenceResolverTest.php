@@ -13,18 +13,10 @@ declare(strict_types=1);
 namespace Tests;
 
 use Godruoyi\Snowflake\RedisSequenceResolver;
-use Godruoyi\Snowflake\Snowflake;
 use RedisException;
 
 class RedisSequenceResolverTest extends TestCase
 {
-    public function setUp(): void
-    {
-        if (! extension_loaded('swoole')) {
-            $this->markTestSkipped('Redis extension is not installed');
-        }
-    }
-
     public function test_invalid_redis_connect(): void
     {
         $redis = $this->createMock(\Redis::class);
@@ -76,19 +68,17 @@ class RedisSequenceResolverTest extends TestCase
         $redis = new \Redis();
         $redis->connect($host, $port | 0);
 
-        // Sometimes running these tests in parallel on Github may cause unexpected errors,
-        // so we change to use random here.
-        $key = (new Snowflake())->getCurrentMillisecond();
+        $randomKey = random_int(0, 99999);
 
         $redisResolver = new RedisSequenceResolver($redis);
 
-        $this->assertEquals(0, $redisResolver->sequence($key));
-        $this->assertEquals(1, $redisResolver->sequence($key));
-        $this->assertEquals(2, $redisResolver->sequence($key));
-        $this->assertEquals(3, $redisResolver->sequence($key));
+        $this->assertEquals(0, $redisResolver->sequence($randomKey));
+        $this->assertEquals(1, $redisResolver->sequence($randomKey));
+        $this->assertEquals(2, $redisResolver->sequence($randomKey));
+        $this->assertEquals(3, $redisResolver->sequence($randomKey));
 
-        sleep(10);
+        sleep(11);
 
-        $this->assertEquals(0, $redisResolver->sequence($key));
+        $this->assertEquals(0, $redisResolver->sequence($randomKey));
     }
 }

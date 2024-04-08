@@ -24,7 +24,7 @@ class LaravelSequenceResolver implements SequenceResolver
     /**
      * Init resolve instance, must be connected.
      */
-    public function __construct(protected Repository $cache) // @phpstan-ignore-line
+    public function __construct(protected Repository $cache)
     {
     }
 
@@ -32,13 +32,11 @@ class LaravelSequenceResolver implements SequenceResolver
     {
         $key = $this->prefix.$currentTime;
 
-        // @phpstan-ignore-next-line
         if ($this->cache->add($key, 1, 10)) {
             return 0;
         }
 
-        // @phpstan-ignore-next-line
-        return $this->cache->increment($key, 1);
+        return $this->cache->increment($key) | 0;
     }
 
     public function setCachePrefix(string $prefix): self

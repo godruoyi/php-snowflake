@@ -16,7 +16,10 @@ jobs:
     runs-on: ubuntu-22.04
 
     strategy:
-      fail-fast: true
+      fail-fast: false
+      matrix:
+        php-version:
+          - 8.2
 
     name: Static Analysis
 
@@ -37,9 +40,6 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
-
-      - name: Install Predis Package
-        run: composer require "predis/predis:^2.0"
 
       - name: Execute type checking
         run: vendor/bin/phpstan

@@ -33,6 +33,7 @@ jobs:
           php-version: 8.2
           tools: composer:v2
           coverage: none
+          extensions: swoole, redis, pcntl
 
       - name: Install dependencies
         uses: nick-fields/retry@v2

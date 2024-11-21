@@ -17,6 +17,10 @@ use Godruoyi\Snowflake\SnowflakeException;
 
 class FileLockResolverTest extends TestCase
 {
+    private FileLockResolver $fileLocker;
+    /** @var callable */
+    private $defer;
+
     protected function setUp(): void
     {
         [$dir, $defer] = $this->prepareLockPath();

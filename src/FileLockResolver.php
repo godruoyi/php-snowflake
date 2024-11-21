@@ -90,7 +90,8 @@ class FileLockResolver implements SequenceResolver
         }
 
         $this->updateContents($contents = $this->incrementSequenceWithSpecifyTime(
-            $this->cleanOldSequences($contents), $currentTime
+            $this->cleanOldSequences($contents),
+            $currentTime
         ), $f);
 
         $this->unlock($f);

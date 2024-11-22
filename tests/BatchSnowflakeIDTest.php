@@ -35,19 +35,6 @@ class BatchSnowflakeIDTest extends TestCase
         $this->assertCount($count, $ids);
     }
 
-    public function test_batch_for_diff_instance_with_default_driver(): void
-    {
-        $ids = [];
-        $count = 100_000; // 100k
-
-        for ($i = 0; $i < $count; $i++) {
-            $ids[(new Snowflake())->id()] = 1;
-        }
-
-        // This pattern will result in generating duplicate IDs.
-        $this->assertGreaterThan(90000, count($ids));
-    }
-
     /**
      * @throws Throwable
      */

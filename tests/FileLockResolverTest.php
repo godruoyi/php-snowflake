@@ -18,6 +18,7 @@ use Godruoyi\Snowflake\SnowflakeException;
 class FileLockResolverTest extends TestCase
 {
     private FileLockResolver $fileLocker;
+
     /** @var callable */
     private $defer;
 

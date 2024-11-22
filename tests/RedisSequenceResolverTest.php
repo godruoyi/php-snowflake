@@ -17,6 +17,13 @@ use RedisException;
 
 class RedisSequenceResolverTest extends TestCase
 {
+    public function setUp(): void
+    {
+        if (! extension_loaded('redis')) {
+            $this->markTestSkipped('Redis extension is not installed');
+        }
+    }
+
     public function test_invalid_redis_connect(): void
     {
         $redis = $this->createMock(\Redis::class);
@@ -57,10 +64,6 @@ class RedisSequenceResolverTest extends TestCase
      */
     public function test_real_redis(): void
     {
-        if (! extension_loaded('redis')) {
-            $this->markTestSkipped('Redis extension is not installed.');
-        }
-
         if (! ($host = getenv('REDIS_HOST')) || ! ($port = getenv('REDIS_PORT'))) {
             $this->markTestSkipped('Redis host or port is not set, skip real redis test.');
         }

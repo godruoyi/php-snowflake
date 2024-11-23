@@ -17,23 +17,27 @@ use Godruoyi\Snowflake\SnowflakeException;
 
 class FileLockResolverTest extends TestCase
 {
+    private static string $mainLockFileDirPath;
+    private static string $localLockFileDirPath;
+
     private FileLockResolver $fileLocker;
 
-    /** @var callable */
-    private $defer;
+    public static function setUpBeforeClass(): void
+    {
+        self::$mainLockFileDirPath = dirname(__DIR__) . '/.locks';
+        self::$localLockFileDirPath = __DIR__ . '/.locks';
+    }
 
     protected function setUp(): void
     {
-        [$dir, $defer] = $this->prepareLockPath();
+        mkdir(self::$mainLockFileDirPath, 0777);
 
-        $this->fileLocker = new FileLockResolver($dir);
-        $this->defer = $defer;
+        $this->fileLocker = new FileLockResolver(self::$mainLockFileDirPath);
     }
 
     protected function tearDown(): void
     {
-        $defer = $this->defer;
-        $defer();
+        $this->cleanUpLockFileDirs();
     }
 
     public function test_prepare_path(): void
@@ -48,16 +52,13 @@ class FileLockResolverTest extends TestCase
         $resolver = new FileLockResolver('/tmp/');
         $this->assertEquals('/tmp/', $this->invokeProperty($resolver, 'lockFileDir'));
 
-        $dir = __DIR__.'/.locks/';
-        if (! is_dir($dir)) {
-            mkdir($dir, 0444);
+        if (! is_dir(self::$localLockFileDirPath)) {
+            mkdir(self::$localLockFileDirPath, 0444);
         }
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage($dir.' is not writable.');
-        $resolver = new FileLockResolver($dir);
-
-        rmdir($dir);
+        $this->expectExceptionMessage(self::$localLockFileDirPath.' is not writable.');
+        $resolver = new FileLockResolver(self::$localLockFileDirPath);
     }
 
     public function test_array_slice(): void
@@ -343,7 +344,7 @@ class FileLockResolverTest extends TestCase
     /**
      * @throws SnowflakeException
      */
-    public function test_can_clean_lock_file()
+    public function test_can_clean_lock_file(): void
     {
         FileLockResolver::$shardCount = 1;
         $fileResolver = $this->fileLocker;
@@ -360,34 +361,35 @@ class FileLockResolverTest extends TestCase
         $this->assertFileDoesNotExist($path);
     }
 
-    private function touch($content = '')
+    private function touch(string $content = ''): string
     {
-        $file = tempnam(dirname(__DIR__).'/.locks', 'snowflake');
+        $file = tempnam(self::$mainLockFileDirPath, 'snowflake');
 
-        if ($content) {
+        if ($file === false) {
+            throw new \RuntimeException('Unable to create file');
+        }
+
+        if ($content !== '') {
             file_put_contents($file, $content);
         }
 
         return $file;
     }
 
-    private function prepareLockPath(): array
+    private function cleanUpLockFileDirs(): void
     {
-        $dir = dirname(__DIR__).'/.locks';
-        rmdir($dir);
-        mkdir($dir, 0777);
-
-        return [$dir, fn () => rmdir($dir)];
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        $glob = dirname(__DIR__).'/.locks/*';
+        $glob = self::$mainLockFileDirPath . '/*';
         $files = glob($glob);
         foreach ($files as $file) {
             if (is_file($file)) {
                 unlink($file);
             }
+        }
+
+        rmdir(self::$mainLockFileDirPath);
+
+        if (is_dir(self::$localLockFileDirPath)) {
+            rmdir(self::$localLockFileDirPath);
         }
     }
 }

@@ -38,7 +38,7 @@ class BatchSnowflakeIDTest extends TestCase
     /**
      * @throws Throwable
      */
-    public function test_batch_for_diff_instance_with_redis_driver()
+    public function test_batch_for_diff_instance_with_redis_driver(): void
     {
         if (! extension_loaded('redis')
             || ! getenv('REDIS_HOST')
@@ -61,7 +61,7 @@ class BatchSnowflakeIDTest extends TestCase
         $this->assertResults($results, 100, 1000);
     }
 
-    public function test_batch_for_diff_instance_with_predis_driver()
+    public function test_batch_for_diff_instance_with_predis_driver(): void
     {
         if (! class_exists('Predis\\Client')
             || ! getenv('REDIS_HOST')
@@ -92,7 +92,7 @@ class BatchSnowflakeIDTest extends TestCase
     /**
      * @throws Throwable
      */
-    public function test_batch_for_diff_instance_with_file_driver()
+    public function test_batch_for_diff_instance_with_file_driver(): void
     {
         $fileResolver = new FileLockResolver(__DIR__);
 

@@ -59,7 +59,7 @@ class SwooleSequenceResolverTest extends TestCase
         }
     }
 
-    public function test_real_swoole()
+    public function test_real_swoole(): void
     {
         if (! extension_loaded('swoole')) {
             $this->markTestSkipped('Swoole extension is not installed.');

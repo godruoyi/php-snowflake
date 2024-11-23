@@ -41,7 +41,7 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
+        "test": "vendor/bin/phpunit --display-incomplete --display-skipped --display-deprecations --display-errors --display-notices --display-warnings",
         "phpstan": "vendor/bin/phpstan",
         "pint": "vendor/bin/pint --config pint.json"
     },

@@ -19,19 +19,20 @@ class FileLockResolverTest extends TestCase
 {
     private static string $mainLockFileDirPath;
 
-    private static string $localLockFileDirPath;
+    private static string $unWriteableFilePath;
 
     private FileLockResolver $fileLocker;
 
     public static function setUpBeforeClass(): void
     {
         self::$mainLockFileDirPath = dirname(__DIR__).'/.locks';
-        self::$localLockFileDirPath = __DIR__.'/.locks';
+        self::$unWriteableFilePath = __DIR__.'/.locks';
     }
 
     protected function setUp(): void
     {
         mkdir(self::$mainLockFileDirPath, 0777);
+        mkdir(self::$unWriteableFilePath, 0444);
 
         $this->fileLocker = new FileLockResolver(self::$mainLockFileDirPath);
     }
@@ -53,13 +54,9 @@ class FileLockResolverTest extends TestCase
         $resolver = new FileLockResolver('/tmp/');
         $this->assertEquals('/tmp/', $this->invokeProperty($resolver, 'lockFileDir'));
 
-        if (! is_dir(self::$localLockFileDirPath)) {
-            mkdir(self::$localLockFileDirPath, 0444);
-        }
-
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage(self::$localLockFileDirPath.' is not writable.');
-        $resolver = new FileLockResolver(self::$localLockFileDirPath);
+        $this->expectExceptionMessage(self::$unWriteableFilePath.' is not writable.');
+        $resolver = new FileLockResolver(self::$unWriteableFilePath);
     }
 
     public function test_array_slice(): void
@@ -389,8 +386,8 @@ class FileLockResolverTest extends TestCase
 
         rmdir(self::$mainLockFileDirPath);
 
-        if (is_dir(self::$localLockFileDirPath)) {
-            rmdir(self::$localLockFileDirPath);
+        if (is_dir(self::$unWriteableFilePath)) {
+            rmdir(self::$unWriteableFilePath);
         }
     }
 }

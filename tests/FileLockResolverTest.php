@@ -18,14 +18,15 @@ use Godruoyi\Snowflake\SnowflakeException;
 class FileLockResolverTest extends TestCase
 {
     private static string $mainLockFileDirPath;
+
     private static string $unWriteableFileDirPath;
 
     private FileLockResolver $fileLocker;
 
     public static function setUpBeforeClass(): void
     {
-        self::$mainLockFileDirPath = dirname(__DIR__) . '/.locks';
-        self::$unWriteableFileDirPath = __DIR__ . '/.locks';
+        self::$mainLockFileDirPath = dirname(__DIR__).'/.locks';
+        self::$unWriteableFileDirPath = __DIR__.'/.locks';
     }
 
     protected function setUp(): void
@@ -375,7 +376,7 @@ class FileLockResolverTest extends TestCase
 
     private function cleanUpLockFileDirs(): void
     {
-        $glob = self::$mainLockFileDirPath . '/*';
+        $glob = self::$mainLockFileDirPath.'/*';
         $files = glob($glob);
         foreach ($files as $file) {
             if (is_file($file)) {

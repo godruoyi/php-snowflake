@@ -19,7 +19,7 @@ use ReflectionException;
 
 class PredisSequenceResolverTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         if (! class_exists('Predis\\Client')) {
             $this->markTestSkipped('Predis extension is not installed');

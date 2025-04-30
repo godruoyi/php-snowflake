@@ -17,7 +17,7 @@ use RedisException;
 
 class RedisSequenceResolverTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         if (! extension_loaded('redis')) {
             $this->markTestSkipped('Redis extension is not installed');

@@ -16,7 +16,7 @@ use Godruoyi\Snowflake\SwooleSequenceResolver;
 
 class SwooleSequenceResolverTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         if (version_compare(PHP_VERSION, '8.4') >= 0) {
             $this->markTestSkipped('Swoole does not yet support PHP 8.4');

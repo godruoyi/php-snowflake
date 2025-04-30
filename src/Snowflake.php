@@ -60,8 +60,8 @@ class Snowflake
         $maxWorkId = -1 ^ (-1 << self::MAX_WORKID_LENGTH);
 
         // If not set datacenter or workid, we will set a default value to use.
-        $this->datacenter = $datacenter > $maxDataCenter || $datacenter < 0 ? random_int(0, 31) : $datacenter;
-        $this->workerId = $workerId > $maxWorkId || $workerId < 0 ? random_int(0, 31) : $workerId;
+        $this->datacenter = $datacenter > $maxDataCenter || $datacenter <= 0 ? random_int(0, 31) : $datacenter;
+        $this->workerId = $workerId > $maxWorkId || $workerId <= 0 ? random_int(0, 31) : $workerId;
     }
 
     /**

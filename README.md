@@ -28,7 +28,7 @@ Snowflake & Sonyflake algorithm PHP implementation [中文文档](https://github
 
 ![file](https://images.godruoyi.com/logos/201908/13/_1565672621_LPW65Pi8cG.png)
 
-Snowflake is a network service that generates unique ID numbers at high scale with simple guarantees.
+Snowflake is a network service that generates unique ID numbers at a high scale with simple guarantees.
 
 1. The first bit is an unused sign bit.
 2. The second part consists of a 41-bit timestamp (in milliseconds) representing the offset of the current time relative to a certain reference time.
@@ -84,7 +84,7 @@ $snowflake = new \Godruoyi\Snowflake\Snowflake($datacenterId, $workerId);
 $snowflake->id();
 ```
 
-3. Specify start time.
+3. Specify the start time.
 
 ```php
 $snowflake = new \Godruoyi\Snowflake\Snowflake;
@@ -95,7 +95,16 @@ $snowflake->id();
 
 > The maximum value of a 41-bit timestamp (in milliseconds) can represent up to 69 years, so the Snowflake algorithm can run safely for 69 years. In order to make the most of it, we recommend setting a start time.
 
-4. Use Sonyflake
+4. Using different sequence number resolvers (optional).
+
+```php
+$snowflake = new \Godruoyi\Snowflake\Snowflake;
+$snowflake->setSequenceResolver(new \Godruoyi\Snowflake\RandomSequenceResolver);
+
+$snowflake->id();
+```
+
+5. Use Sonyflake
 
 ```php
 $sonyflake = new \Godruoyi\Snowflake\Sonyflake;

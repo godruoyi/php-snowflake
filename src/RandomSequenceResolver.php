@@ -43,7 +43,7 @@ class RandomSequenceResolver implements SequenceResolver
             return $this->sequence;
         }
 
-        $this->sequence = random_int(0, $this->maxSequence);
+        $this->sequence = crc32(uniqid((string) random_int(0, PHP_INT_MAX), true)) % $this->maxSequence;
         $this->lastTimeStamp = $currentTime;
 
         return $this->sequence;

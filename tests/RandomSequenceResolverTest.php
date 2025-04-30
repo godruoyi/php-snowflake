@@ -29,7 +29,7 @@ class RandomSequenceResolverTest extends TestCase
         $this->assertCount(Snowflake::MAX_SEQUENCE_SIZE, $seqs);
     }
 
-    public function test_can_generate_unique_id_by_snowflake(): void
+    public function test_can_generate_unique_id_using_same_instance(): void
     {
         $snowflake = new Snowflake(1, 1);
         $seqs = [];
@@ -39,5 +39,20 @@ class RandomSequenceResolverTest extends TestCase
         }
 
         $this->assertCount(Snowflake::MAX_SEQUENCE_SIZE, $seqs);
+    }
+
+    public function test_can_generate_unique_id_by_different_instance(): void
+    {
+        for ($i = 0; $i < 1000; $i++) {
+            $ids = [];
+
+            for ($i = 0; $i < 100_000; $i++) {
+                $snowflake = new Snowflake();
+                $ids[$snowflake->id()] = true;
+            }
+
+            // We expect to have at least 100_000 - 10 unique ids if using random sequence resolver
+            $this->assertGreaterThanOrEqual(100_000 - 10, count($ids));
+        }
     }
 }

@@ -54,14 +54,14 @@ class Snowflake
     /**
      * Build Snowflake Instance.
      */
-    public function __construct(int $datacenter = 0, int $workerId = 0)
+    public function __construct(int $datacenter = -1, int $workerId = -1)
     {
         $maxDataCenter = -1 ^ (-1 << self::MAX_DATACENTER_LENGTH);
         $maxWorkId = -1 ^ (-1 << self::MAX_WORKID_LENGTH);
 
         // If not set datacenter or workid, we will set a default value to use.
-        $this->datacenter = $datacenter > $maxDataCenter || $datacenter <= 0 ? random_int(0, 31) : $datacenter;
-        $this->workerId = $workerId > $maxWorkId || $workerId <= 0 ? random_int(0, 31) : $workerId;
+        $this->datacenter = $datacenter > $maxDataCenter || $datacenter < 0 ? random_int(0, 31) : $datacenter;
+        $this->workerId = $workerId > $maxWorkId || $workerId < 0 ? random_int(0, 31) : $workerId;
     }
 
     /**

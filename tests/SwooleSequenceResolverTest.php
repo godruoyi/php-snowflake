@@ -18,8 +18,8 @@ class SwooleSequenceResolverTest extends TestCase
 {
     protected function setUp(): void
     {
-        if (version_compare(PHP_VERSION, '8.4') >= 0) {
-            $this->markTestSkipped('Swoole does not yet support PHP 8.4');
+        if (version_compare(PHP_VERSION, '8.5') >= 0) {
+            $this->markTestSkipped('Swoole does not yet support PHP 8.5');
         }
 
         if (! extension_loaded('swoole')) {
@@ -46,7 +46,7 @@ class SwooleSequenceResolverTest extends TestCase
         $snowflake = new SwooleSequenceResolver();
 
         $lock = $this->createStub(\Swoole\Lock::class);
-        $lock->expects($this->any())->method('trylock')->willReturn(false);
+        $lock->expects($this->any())->method('lock')->willReturn(false);
         $lock->expects($this->any())->method('unlock')->willReturn(true);
 
         $snowflake->resetLock($lock);

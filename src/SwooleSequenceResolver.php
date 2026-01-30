@@ -51,7 +51,7 @@ class SwooleSequenceResolver implements SequenceResolver
         if (method_exists($this->lock, 'tryLock')) {
             $acquiredLock = $this->lock->tryLock();
         } else {
-            $acquiredLock = $this->lock->lock(LOCK_NB);
+            $acquiredLock = $this->lock->lock(LOCK_EX | LOCK_NB);
         }
 
         // If swoole lock failure，we will return a big number, and recall this method when next millisecond.

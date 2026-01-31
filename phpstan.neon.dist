@@ -3,3 +3,5 @@ parameters:
     - src
 
   level: 9
+  stubFiles:
+    - stubs/SwooleLock61.php.stub

@@ -15,7 +15,7 @@ namespace Godruoyi\Snowflake;
 class SwooleSequenceResolver implements SequenceResolver
 {
     /**
-     * The las ttimestamp.
+     * The last timestamp.
      */
     protected ?int $lastTimeStamp = -1;
 
@@ -47,8 +47,15 @@ class SwooleSequenceResolver implements SequenceResolver
      */
     public function sequence(int $currentTime): int
     {
+        // Swoole removed "tryLock" method in 6.1.0
+        if (method_exists($this->lock, 'tryLock')) {
+            $acquiredLock = $this->lock->tryLock();
+        } else {
+            $acquiredLock = $this->lock->lock(LOCK_EX | LOCK_NB);
+        }
+
         // If swoole lock failure，we will return a big number, and recall this method when next millisecond.
-        if (! $this->lock->trylock()) {
+        if (! $acquiredLock) {
             if ($this->count >= 10) {
                 throw new SnowflakeException('Swoole lock failure, Unable to get the program lock after many attempts.');
             }

@@ -54,7 +54,7 @@ class Snowflake
     /**
      * The current time resolver.
      *
-     * @var (Closure(): int)|null
+     * @var (Closure(): float)|null
      */
     protected ?Closure $timeResolver = null;
 
@@ -118,7 +118,13 @@ class Snowflake
      */
     public function getCurrentMillisecond(): int
     {
-        return $this->timeResolver === null ? floor(microtime(true) * 1000) | 0 : call_user_func($this->timeResolver);
+        return floor(
+            (
+                $this->timeResolver === null
+                    ? microtime(true)
+                    : call_user_func($this->timeResolver)
+            ) * 1000
+        ) | 0;
     }
 
     /**
@@ -137,7 +143,10 @@ class Snowflake
         $maxTimeDiff = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
 
         if ($missTime > $maxTimeDiff) {
-            throw new SnowflakeException(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
+            throw new SnowflakeException(sprintf(
+                'The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this',
+                self::MAX_TIMESTAMP_LENGTH
+            ));
         }
 
         $this->startTime = $millisecond;
@@ -150,7 +159,7 @@ class Snowflake
      */
     public function getStartTimeStamp(): float|int
     {
-        if (! is_null($this->startTime)) {
+        if (!is_null($this->startTime)) {
             return $this->startTime;
         }
 
@@ -189,9 +198,9 @@ class Snowflake
     /**
      * Set the time resolver.
      *
-     * @param  (Closure(): int)|null  $timeResolver
+     * @param  (Closure(): float)|null  $timeResolver
      */
-    public function setTimeResolver(Closure|null $timeResolver): self
+    public function setCurrentTimeResolver(Closure|null $timeResolver): self
     {
         $this->timeResolver = $timeResolver;
 
@@ -201,9 +210,9 @@ class Snowflake
     /**
      * Get the time resolver.
      *
-     * @return (Closure(): int)|null
+     * @return (Closure(): float)|null
      */
-    public function getTimeResolver(): Closure|null
+    public function getCurrentTimeResolver(): Closure|null
     {
         return $this->timeResolver;
     }
@@ -215,11 +224,11 @@ class Snowflake
     {
         $resolver = $this->getSequenceResolver();
 
-        if (! is_null($resolver) && is_callable($resolver)) {
+        if (!is_null($resolver) && is_callable($resolver)) {
             return $resolver($currentTime);
         }
 
-        return ! ($resolver instanceof SequenceResolver)
+        return !($resolver instanceof SequenceResolver)
             ? $this->getDefaultSequenceResolver()->sequence($currentTime)
             : $resolver->sequence($currentTime);
     }

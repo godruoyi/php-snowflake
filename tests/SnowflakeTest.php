@@ -213,16 +213,23 @@ class SnowflakeTest extends TestCase
     public function test_time_resolver(): void
     {
         $snowflake = new Snowflake(999, 20);
-        $snowflake->setTimeResolver(function (): int {
-            return 2832794913314;
+
+        // Same contract as microtime(true): seconds since Unix epoch (float).
+        // Pick an absolute instant in ms, as if derived from a row's created_at.
+        $currentMs = 2_832_794_913_314;
+        $unixSeconds = $currentMs / 1000.0;
+
+        $snowflake->setCurrentTimeResolver(static function () use ($unixSeconds): float {
+            return $unixSeconds;
         });
 
-        $resolver = $snowflake->getTimeResolver();
+        $resolver = $snowflake->getCurrentTimeResolver();
         $this->assertInstanceOf(Closure::class, $resolver);
-        $this->assertSame(2832794913314, $resolver());
+        $this->assertSame($unixSeconds, $resolver());
 
         $id = $snowflake->id();
-        $this->assertSame(1267543225314, $snowflake->parseId($id, true)['timestamp']);
+        $expectedTs = (int) floor($unixSeconds * 1000) - (int) $snowflake->getStartTimeStamp();
+        $this->assertSame($expectedTs, $snowflake->parseId($id, true)['timestamp']);
     }
 
     public function test_get_sequence_resolver(): void

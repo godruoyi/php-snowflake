@@ -53,6 +53,8 @@ class Snowflake
 
     /**
      * The current time resolver.
+     *
+     * @var (Closure(): int)|null
      */
     protected ?Closure $timeResolver = null;
 
@@ -182,6 +184,28 @@ class Snowflake
     public function getDefaultSequenceResolver(): SequenceResolver
     {
         return $this->defaultSequenceResolver ?: $this->defaultSequenceResolver = new RandomSequenceResolver();
+    }
+
+    /**
+     * Set the time resolver.
+     *
+     * @param  (Closure(): int)|null  $timeResolver
+     */
+    public function setTimeResolver(Closure|null $timeResolver): self
+    {
+        $this->timeResolver = $timeResolver;
+
+        return $this;
+    }
+
+    /**
+     * Get the time resolver.
+     *
+     * @return (Closure(): int)|null
+     */
+    public function getTimeResolver(): Closure|null
+    {
+        return $this->timeResolver;
     }
 
     /**

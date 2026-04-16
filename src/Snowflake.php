@@ -52,6 +52,11 @@ class Snowflake
     protected ?SequenceResolver $defaultSequenceResolver = null;
 
     /**
+     * The current time resolver.
+     */
+    protected ?Closure $timeResolver = null;
+
+    /**
      * Build Snowflake Instance.
      */
     public function __construct(int $datacenter = -1, int $workerId = -1)
@@ -111,7 +116,7 @@ class Snowflake
      */
     public function getCurrentMillisecond(): int
     {
-        return floor(microtime(true) * 1000) | 0;
+        return $this->timeResolver === null ? floor(microtime(true) * 1000) | 0 : call_user_func($this->timeResolver);
     }
 
     /**

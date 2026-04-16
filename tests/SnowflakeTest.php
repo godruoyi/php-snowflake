@@ -214,15 +214,15 @@ class SnowflakeTest extends TestCase
     {
         $snowflake = new Snowflake(999, 20);
         $snowflake->setTimeResolver(function (): int {
-            return 90210;
+            return 2832794913314;
         });
 
         $resolver = $snowflake->getTimeResolver();
         $this->assertInstanceOf(Closure::class, $resolver);
-        $this->assertSame(90210, $resolver());
+        $this->assertSame(2832794913314, $resolver());
 
         $id = $snowflake->id();
-        $this->assertSame(90210, $snowflake->parseId($id, true)['timestamp']);
+        $this->assertSame(1267543225314, $snowflake->parseId($id, true)['timestamp']);
     }
 
     public function test_get_sequence_resolver(): void

@@ -213,7 +213,7 @@ class SnowflakeTest extends TestCase
     public function test_time_resolver(): void
     {
         $snowflake = new Snowflake(999, 20);
-        $snowflake->setTimeResolver(function(): int {
+        $snowflake->setTimeResolver(function (): int {
             return 90210;
         });
 

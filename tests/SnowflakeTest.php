@@ -279,9 +279,7 @@ class SnowflakeTest extends TestCase
         $this->assertEquals(1, $parsed['workerid']);
         $timestamp = $parsed['timestamp'];
 
-        $parsedDt = new DateTime();
-        $parsedDt->setTimestamp($timestamp);
-        $this->assertEquals(60 * 60 * 1000, $parsedDt->getTimestamp());
+        $this->assertEquals(60 * 60 * 1000, $timestamp);
     }
 
     public static function idForTimestampDataProvider(): array

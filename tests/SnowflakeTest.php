@@ -525,4 +525,66 @@ class SnowflakeTest extends TestCase
         $this->assertGreaterThanOrEqual(0, $parsed['sequence']);
         $this->assertLessThanOrEqual((1 << 20) - 1, $parsed['sequence']);
     }
+
+    public function test_default_method_is_drift(): void
+    {
+        $snowflake = new Snowflake();
+        $this->assertSame(Snowflake::DRIFT_METHOD, $snowflake->getMethod());
+    }
+
+    public function test_set_method_drift(): void
+    {
+        $snowflake = new Snowflake(1, 1);
+        $snowflake->setMethod(Snowflake::DRIFT_METHOD);
+        $this->assertSame(Snowflake::DRIFT_METHOD, $snowflake->getMethod());
+
+        $id = $snowflake->id();
+        $this->assertNotEmpty($id);
+    }
+
+    public function test_set_method_traditional(): void
+    {
+        $snowflake = new Snowflake(1, 1);
+        $snowflake->setMethod(Snowflake::TRADITIONAL_METHOD);
+        $this->assertSame(Snowflake::TRADITIONAL_METHOD, $snowflake->getMethod());
+
+        $id = $snowflake->id();
+        $this->assertNotEmpty($id);
+    }
+
+    public function test_set_method_invalid_throws(): void
+    {
+        $this->expectException(SnowflakeException::class);
+        $this->expectExceptionMessage('Method must be');
+        (new Snowflake())->setMethod(3);
+    }
+
+    public function test_drift_method_generates_unique_ids_on_overflow(): void
+    {
+        // Use a resolver that resets sequence to 0 on each new (drifted) timestamp,
+        // and increments within the same timestamp. maxSequenceNumber=1 means overflow
+        // happens after seq > 1, triggering a drift on every third call per ms.
+        $snowflake = new Snowflake(1, 1);
+        $snowflake->setMethod(Snowflake::DRIFT_METHOD);
+        $snowflake->setSequenceBitLength(3);  // 0–7
+        $snowflake->setMaxSequenceNumber(1);  // overflow when seq > 1
+
+        $lastTime = null;
+        $seq = 0;
+        $snowflake->setSequenceResolver(function (int $time) use (&$lastTime, &$seq) {
+            if ($lastTime !== $time) {
+                $lastTime = $time;
+                $seq = 0;
+            }
+            return $seq++;
+        });
+
+        $ids = [];
+        for ($i = 0; $i < 20; $i++) {
+            $id = $snowflake->id();
+            $ids[$id] = true;
+        }
+
+        $this->assertCount(20, $ids, 'Drift method must produce unique IDs even under sequence overflow');
+    }
 }

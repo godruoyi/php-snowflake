@@ -144,7 +144,28 @@ $snowflake->id();
 
 > Set `maxSequenceNumber` to `0` to automatically use the maximum value derived from the sequence bit length (default behavior).
 
-7. Use Sonyflake
+7. Choosing the ID generation method (optional).
+
+There are two ways to handle sequence overflow (when all sequence numbers within a millisecond have been used):
+
+- **Drift method** (`Snowflake::DRIFT_METHOD`, value `1`, **default**): the timestamp portion is incremented by 1, borrowing a future millisecond. ID generation never blocks — throughput is limited only by CPU speed, and the embedded timestamp may temporarily run slightly ahead of the wall clock.
+- **Traditional method** (`Snowflake::TRADITIONAL_METHOD`, value `2`): the generator spin-waits until the real clock advances to the next millisecond. Throughput is capped at `maxSequenceNumber × 1 000` IDs per second.
+
+```php
+use Godruoyi\Snowflake\Snowflake;
+
+// Drift method (default — no need to call setMethod explicitly)
+$snowflake = new Snowflake;
+$snowflake->setMethod(Snowflake::DRIFT_METHOD);
+$snowflake->id();
+
+// Traditional method
+$snowflake = new Snowflake;
+$snowflake->setMethod(Snowflake::TRADITIONAL_METHOD);
+$snowflake->id();
+```
+
+8. Use Sonyflake
 
 ```php
 $sonyflake = new \Godruoyi\Snowflake\Sonyflake;

@@ -28,6 +28,24 @@ class Snowflake
     public const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
 
     /**
+     * Drift algorithm: when the sequence overflows within a millisecond, the timestamp
+     * is incremented by 1 (borrowing a future millisecond) instead of waiting for the
+     * real clock to advance. This maximises throughput without blocking.
+     */
+    public const DRIFT_METHOD = 1;
+
+    /**
+     * Traditional algorithm: when the sequence overflows, the generator waits (spins)
+     * until the real clock moves to the next millisecond before continuing.
+     */
+    public const TRADITIONAL_METHOD = 2;
+
+    /**
+     * The ID generation method (DRIFT_METHOD or TRADITIONAL_METHOD, default: DRIFT_METHOD).
+     */
+    protected int $method = self::DRIFT_METHOD;
+
+    /**
      * The worker ID bit length (configurable, default: MAX_WORKID_LENGTH).
      */
     protected int $workerIdBitLength = self::MAX_WORKID_LENGTH;
@@ -78,6 +96,11 @@ class Snowflake
     protected ?SequenceResolver $defaultSequenceResolver = null;
 
     /**
+     * The last timestamp used to generate an ID (tracks drift to prevent duplicate timestamps).
+     */
+    protected int $lastTimestamp = 0;
+
+    /**
      * Build Snowflake Instance.
      */
     public function __construct(int $datacenter = -1, int $workerId = -1)
@@ -95,11 +118,24 @@ class Snowflake
      */
     public function id(): string
     {
-        $currentTime = $this->getCurrentMillisecond();
-        while (($sequence = $this->callResolver($currentTime)) > $this->getMaxSequenceNumber()) {
-            usleep(1);
-            $currentTime = $this->getCurrentMillisecond();
+        // Start from the greater of the real clock or the last used timestamp so that
+        // IDs are always monotonically increasing even after a drift run.
+        $currentTime = max($this->getCurrentMillisecond(), $this->lastTimestamp);
+
+        if ($this->method === self::DRIFT_METHOD) {
+            // Drift algorithm: borrow future milliseconds on sequence overflow (no blocking).
+            while (($sequence = $this->callResolver($currentTime)) > $this->getMaxSequenceNumber()) {
+                $currentTime++;
+            }
+        } else {
+            // Traditional algorithm: wait for the real clock to advance on sequence overflow.
+            while (($sequence = $this->callResolver($currentTime)) > $this->getMaxSequenceNumber()) {
+                usleep(1);
+                $currentTime = max($this->getCurrentMillisecond(), $this->lastTimestamp);
+            }
         }
+
+        $this->lastTimestamp = $currentTime;
 
         return $this->buildId($currentTime, $this->getStartTimeStamp(), $sequence);
     }
@@ -413,6 +449,39 @@ class Snowflake
     public function getMinSequenceNumber(): int
     {
         return $this->minSequenceNumber;
+    }
+
+    /**
+     * Set the ID generation method.
+     *
+     * - Snowflake::DRIFT_METHOD (1): on sequence overflow, borrow the next millisecond
+     *   by incrementing the timestamp instead of waiting for the real clock (default).
+     * - Snowflake::TRADITIONAL_METHOD (2): on sequence overflow, spin-wait until the
+     *   real clock advances to the next millisecond.
+     *
+     * @throws SnowflakeException
+     */
+    public function setMethod(int $method): self
+    {
+        if ($method !== self::DRIFT_METHOD && $method !== self::TRADITIONAL_METHOD) {
+            throw new SnowflakeException(sprintf(
+                'Method must be %d (drift) or %d (traditional)',
+                self::DRIFT_METHOD,
+                self::TRADITIONAL_METHOD
+            ));
+        }
+
+        $this->method = $method;
+
+        return $this;
+    }
+
+    /**
+     * Get the current ID generation method.
+     */
+    public function getMethod(): int
+    {
+        return $this->method;
     }
 
     /**

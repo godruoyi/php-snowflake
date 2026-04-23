@@ -143,7 +143,7 @@ class SnowflakeTest extends TestCase
 
         $this->assertTrue($payloads['datacenter'] === 2);
         $this->assertTrue($payloads['workerid'] === 3);
-        $this->assertLessThan(Snowflake::MAX_SEQUENCE_SIZE, $payloads['sequence']);
+        $this->assertLessThanOrEqual(Snowflake::MAX_SEQUENCE_SIZE, $payloads['sequence']);
 
         $payloads = $snowflake->parseId('0');
         $this->assertTrue($payloads['timestamp'] == '' || $payloads['timestamp'] == false);
@@ -435,7 +435,7 @@ class SnowflakeTest extends TestCase
         $this->expectExceptionMessage('MinSequenceNumber must be less than MaxSequenceNumber');
         $snowflake = new Snowflake(1, 1);
         $snowflake->setMaxSequenceNumber(10);
-        $snowflake->setMinSequenceNumber(10);
+        $snowflake->setMinSequenceNumber(11);
     }
 
     public function test_custom_bit_lengths_produce_valid_ids(): void

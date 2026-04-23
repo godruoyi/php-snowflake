@@ -48,7 +48,7 @@ class RandomSequenceResolver implements SequenceResolver
             return $this->sequence;
         }
 
-        $range = max(1, $this->maxSequence - $this->minSequence);
+        $range = max(1, $this->maxSequence - $this->minSequence + 1);
         $this->sequence = $this->minSequence + (abs(crc32(uniqid((string) random_int(0, PHP_INT_MAX), true))) % $range);
         $this->lastTimeStamp = $currentTime;
 

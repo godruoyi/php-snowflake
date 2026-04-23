@@ -563,7 +563,8 @@ class SnowflakeTest extends TestCase
     {
         // Use a resolver that resets sequence to 0 on each new (drifted) timestamp,
         // and increments within the same timestamp. maxSequenceNumber=1 means overflow
-        // happens after seq > 1, triggering a drift on every third call per ms.
+        // occurs when seq > 1, so drift is triggered on the third ID within the same
+        // millisecond (sequence values 0 and 1 are valid; 2 triggers overflow).
         $snowflake = new Snowflake(1, 1);
         $snowflake->setMethod(Snowflake::DRIFT_METHOD);
         $snowflake->setSequenceBitLength(3);  // 0–7

@@ -86,11 +86,11 @@ class Snowflake
      * @return string
      * @throws SnowflakeException
      */
-    public function idForTimestamp($timestamp): string
+    public function idForTimestamp(int|DateTimeInterface $timestamp): string
     {
-        $currentTime = (int) ($timestamp instanceof DateTimeInterface
-            ? $timestamp->format('Uv')
-            : $timestamp);
+        $currentTime = $timestamp instanceof DateTimeInterface
+            ? (int) $timestamp->format('Uv')
+            : $timestamp;
 
         // Validate timestamp is not earlier than start time
         $startTime = $this->getStartTimeStamp();

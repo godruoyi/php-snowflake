@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Godruoyi\Snowflake;
 
 use Closure;
+use DateTimeInterface;
 
 class Snowflake
 {
@@ -75,11 +76,43 @@ class Snowflake
             $currentTime = $this->getCurrentMillisecond();
         }
 
+        return $this->buildId($currentTime, $this->getStartTimeStamp(), $sequence);
+    }
+
+    /**
+     * Generate snowflake id for a specific timestamp.
+     *
+     * @param  int|DateTimeInterface $timestamp The timestamp to generate ID for (in milliseconds or DateTime object)
+     * @return string
+     * @throws SnowflakeException
+     */
+    public function idForTimestamp(int|DateTimeInterface $timestamp): string
+    {
+        $currentTime = $timestamp instanceof DateTimeInterface
+            ? (int) $timestamp->format('Uv')
+            : $timestamp;
+
+        // Validate timestamp is not earlier than start time
+        $startTime = $this->getStartTimeStamp();
+        if ($currentTime < $startTime) {
+            throw new SnowflakeException('The provided timestamp cannot be earlier than the start time');
+        }
+
+        // Get sequence number (auto-increment if overflow)
+        while (($sequence = $this->callResolver($currentTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
+            $currentTime++;
+        }
+
+        return $this->buildId($currentTime, $startTime, $sequence);
+    }
+
+    protected function buildId(int $currentTime, float|int $startTime, int $sequence): string
+    {
         $workerLeftMoveLength = self::MAX_SEQUENCE_LENGTH;
         $datacenterLeftMoveLength = self::MAX_WORKID_LENGTH + $workerLeftMoveLength;
         $timestampLeftMoveLength = self::MAX_DATACENTER_LENGTH + $datacenterLeftMoveLength;
 
-        return (string) ((($currentTime - $this->getStartTimeStamp()) << $timestampLeftMoveLength)
+        return (string) ((($currentTime - $startTime) << $timestampLeftMoveLength)
             | ($this->datacenter << $datacenterLeftMoveLength)
             | ($this->workerId << $workerLeftMoveLength)
             | ($sequence));
@@ -130,7 +163,10 @@ class Snowflake
         $maxTimeDiff = -1 ^ (-1 << self::MAX_TIMESTAMP_LENGTH);
 
         if ($missTime > $maxTimeDiff) {
-            throw new SnowflakeException(sprintf('The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this', self::MAX_TIMESTAMP_LENGTH));
+            throw new SnowflakeException(sprintf(
+                'The current microtime - starttime is not allowed to exceed -1 ^ (-1 << %d), You can reset the start time to fix this',
+                self::MAX_TIMESTAMP_LENGTH
+            ));
         }
 
         $this->startTime = $millisecond;
@@ -143,7 +179,7 @@ class Snowflake
      */
     public function getStartTimeStamp(): float|int
     {
-        if (! is_null($this->startTime)) {
+        if (!is_null($this->startTime)) {
             return $this->startTime;
         }
 
@@ -186,11 +222,11 @@ class Snowflake
     {
         $resolver = $this->getSequenceResolver();
 
-        if (! is_null($resolver) && is_callable($resolver)) {
+        if (!is_null($resolver) && is_callable($resolver)) {
             return $resolver($currentTime);
         }
 
-        return ! ($resolver instanceof SequenceResolver)
+        return !($resolver instanceof SequenceResolver)
             ? $this->getDefaultSequenceResolver()->sequence($currentTime)
             : $resolver->sequence($currentTime);
     }

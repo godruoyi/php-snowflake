@@ -326,12 +326,17 @@ class SnowflakeTest extends TestCase
         // Must reduce sequenceBitLength first to make room for a larger workerIdBitLength
         $snowflake->setSequenceBitLength(6)->setWorkerIdBitLength(6);
         $this->assertSame(6, $snowflake->getWorkerIdBitLength());
+
+        // zero is valid (single-node / no worker field)
+        $snowflake2 = new Snowflake(0, 0);
+        $snowflake2->setWorkerIdBitLength(0);
+        $this->assertSame(0, $snowflake2->getWorkerIdBitLength());
     }
 
     public function test_set_worker_id_bit_length_out_of_range_throws(): void
     {
         $this->expectException(SnowflakeException::class);
-        $this->expectExceptionMessage('WorkerIdBitLength must be between 1 and 15');
+        $this->expectExceptionMessage('WorkerIdBitLength must be between 0 and 15');
         (new Snowflake())->setWorkerIdBitLength(16);
     }
 
@@ -485,5 +490,28 @@ class SnowflakeTest extends TestCase
         $this->assertSame(4, $snowflake->getDatacenterBitLength());
         $this->assertSame(60, $snowflake->getMaxSequenceNumber());
         $this->assertSame(5, $snowflake->getMinSequenceNumber());
+    }
+
+    public function test_no_worker_no_datacenter_single_node_sequence_only(): void
+    {
+        // dc=0, worker=0, seq=20 — all 20 non-timestamp bits used for sequence
+        $snowflake = new Snowflake(0, 0);
+        $snowflake->setDatacenterBitLength(0)
+            ->setWorkerIdBitLength(0)
+            ->setSequenceBitLength(20);
+
+        $this->assertSame(0, $snowflake->getDatacenterBitLength());
+        $this->assertSame(0, $snowflake->getWorkerIdBitLength());
+        $this->assertSame(20, $snowflake->getSequenceBitLength());
+        $this->assertSame((1 << 20) - 1, $snowflake->getMaxSequenceNumber()); // 2^20-1
+
+        $id = $snowflake->id();
+        $this->assertNotEmpty($id);
+
+        $parsed = $snowflake->parseId($id, true);
+        $this->assertSame(0, $parsed['datacenter']);
+        $this->assertSame(0, $parsed['workerid']);
+        $this->assertGreaterThanOrEqual(0, $parsed['sequence']);
+        $this->assertLessThanOrEqual((1 << 20) - 1, $parsed['sequence']);
     }
 }

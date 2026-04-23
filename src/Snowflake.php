@@ -261,8 +261,8 @@ class Snowflake
      */
     public function setWorkerIdBitLength(int $length): self
     {
-        if ($length < 1 || $length > 15) {
-            throw new SnowflakeException('WorkerIdBitLength must be between 1 and 15');
+        if ($length < 0 || $length > 15) {
+            throw new SnowflakeException('WorkerIdBitLength must be between 0 and 15');
         }
 
         if ($this->datacenterBitLength + $length + $this->sequenceBitLength > 22) {

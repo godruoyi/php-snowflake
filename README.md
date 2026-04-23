@@ -104,7 +104,68 @@ $snowflake->setSequenceResolver(new \Godruoyi\Snowflake\RandomSequenceResolver);
 $snowflake->id();
 ```
 
-5. Use Sonyflake
+5. Configuring bit lengths for worker ID, datacenter, and sequence (optional).
+
+By default, the Snowflake structure uses 5 bits for datacenter, 5 bits for worker ID, and 12 bits for sequence number. These can be freely customized — the only hard constraint is that `datacenterBitLength + workerIdBitLength + sequenceBitLength` must not exceed 62 (leaving at least 1 bit for the timestamp). Both `datacenterBitLength` and `workerIdBitLength` may be set to `0` for single-node deployments.
+
+```php
+$snowflake = new \Godruoyi\Snowflake\Snowflake(1, 1);
+$snowflake
+    ->setSequenceBitLength(6)    // 2^6-1 = 63 sequences per millisecond
+    ->setWorkerIdBitLength(6)    // up to 63 workers
+    ->setDatacenterBitLength(4); // up to 15 datacenters
+
+$snowflake->id();
+```
+
+Single-node example (no worker/datacenter fields, all bits for sequence):
+
+```php
+$snowflake = new \Godruoyi\Snowflake\Snowflake(0, 0);
+$snowflake
+    ->setDatacenterBitLength(0)  // no datacenter field
+    ->setWorkerIdBitLength(0)    // no worker field
+    ->setSequenceBitLength(20);  // up to 2^20-1 = 1 048 575 sequences per millisecond
+
+$snowflake->id();
+```
+
+> The setter order does not matter — each call validates the current total against the 62-bit budget independently.
+
+6. Configuring max and min sequence numbers (optional).
+
+```php
+$snowflake = new \Godruoyi\Snowflake\Snowflake;
+$snowflake->setMaxSequenceNumber(100); // limit sequences to 0-100 per millisecond
+$snowflake->setMinSequenceNumber(5);   // reserve sequence numbers 0-4 (e.g. for clock rollback)
+
+$snowflake->id();
+```
+
+> Set `maxSequenceNumber` to `0` to automatically use the maximum value derived from the sequence bit length (default behavior).
+
+7. Choosing the ID generation method (optional).
+
+There are two ways to handle sequence overflow (when all sequence numbers within a millisecond have been used):
+
+- **Drift method** (`Snowflake::DRIFT_METHOD`, value `1`, **default**): the timestamp portion is incremented by 1, borrowing a future millisecond. ID generation never blocks — throughput is limited only by CPU speed, and the embedded timestamp may temporarily run slightly ahead of the wall clock.
+- **Traditional method** (`Snowflake::TRADITIONAL_METHOD`, value `2`): the generator spin-waits until the real clock advances to the next millisecond. Throughput is capped at `maxSequenceNumber × 1 000` IDs per second.
+
+```php
+use Godruoyi\Snowflake\Snowflake;
+
+// Drift method (default — no need to call setMethod explicitly)
+$snowflake = new Snowflake;
+$snowflake->setMethod(Snowflake::DRIFT_METHOD);
+$snowflake->id();
+
+// Traditional method
+$snowflake = new Snowflake;
+$snowflake->setMethod(Snowflake::TRADITIONAL_METHOD);
+$snowflake->id();
+```
+
+8. Use Sonyflake
 
 ```php
 $sonyflake = new \Godruoyi\Snowflake\Sonyflake;

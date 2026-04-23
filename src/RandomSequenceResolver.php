@@ -32,6 +32,11 @@ class RandomSequenceResolver implements SequenceResolver
     protected int $maxSequence = Snowflake::MAX_SEQUENCE_SIZE;
 
     /**
+     * Min sequence number in single ms.
+     */
+    protected int $minSequence = 0;
+
+    /**
      * @throws Exception
      */
     public function sequence(int $currentTime): int
@@ -43,7 +48,8 @@ class RandomSequenceResolver implements SequenceResolver
             return $this->sequence;
         }
 
-        $this->sequence = crc32(uniqid((string) random_int(0, PHP_INT_MAX), true)) % $this->maxSequence;
+        $range = max(1, $this->maxSequence - $this->minSequence + 1);
+        $this->sequence = $this->minSequence + (abs(crc32(uniqid((string) random_int(0, PHP_INT_MAX), true))) % $range);
         $this->lastTimeStamp = $currentTime;
 
         return $this->sequence;
@@ -52,5 +58,10 @@ class RandomSequenceResolver implements SequenceResolver
     public function setMaxSequence(int $maxSequence): void
     {
         $this->maxSequence = $maxSequence;
+    }
+
+    public function setMinSequence(int $minSequence): void
+    {
+        $this->minSequence = $minSequence;
     }
 }

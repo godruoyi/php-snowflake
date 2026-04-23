@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Godruoyi\Snowflake;
 
 use Closure;
+use DateTimeInterface;
 
 class Snowflake
 {
@@ -52,13 +53,6 @@ class Snowflake
     protected ?SequenceResolver $defaultSequenceResolver = null;
 
     /**
-     * The current time resolver.
-     *
-     * @var (Closure(): float)|null
-     */
-    protected ?Closure $timeResolver = null;
-
-    /**
      * Build Snowflake Instance.
      */
     public function __construct(int $datacenter = -1, int $workerId = -1)
@@ -82,11 +76,43 @@ class Snowflake
             $currentTime = $this->getCurrentMillisecond();
         }
 
+        return $this->buildId($currentTime, $this->getStartTimeStamp(), $sequence);
+    }
+
+    /**
+     * Generate snowflake id for a specific timestamp.
+     *
+     * @param  int|DateTimeInterface $timestamp The timestamp to generate ID for (in milliseconds or DateTime object)
+     * @return string
+     * @throws SnowflakeException
+     */
+    public function idForTimestamp($timestamp): string
+    {
+        $currentTime = (int) ($timestamp instanceof DateTimeInterface
+            ? $timestamp->format('Uv')
+            : $timestamp);
+
+        // Validate timestamp is not earlier than start time
+        $startTime = $this->getStartTimeStamp();
+        if ($currentTime < $startTime) {
+            throw new SnowflakeException('The provided timestamp cannot be earlier than the start time');
+        }
+
+        // Get sequence number (auto-increment if overflow)
+        while (($sequence = $this->callResolver($currentTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
+            $currentTime++;
+        }
+
+        return $this->buildId($currentTime, $startTime, $sequence);
+    }
+
+    protected function buildId(int $currentTime, float|int $startTime, int $sequence): string
+    {
         $workerLeftMoveLength = self::MAX_SEQUENCE_LENGTH;
         $datacenterLeftMoveLength = self::MAX_WORKID_LENGTH + $workerLeftMoveLength;
         $timestampLeftMoveLength = self::MAX_DATACENTER_LENGTH + $datacenterLeftMoveLength;
 
-        return (string) ((($currentTime - $this->getStartTimeStamp()) << $timestampLeftMoveLength)
+        return (string) ((($currentTime - $startTime) << $timestampLeftMoveLength)
             | ($this->datacenter << $datacenterLeftMoveLength)
             | ($this->workerId << $workerLeftMoveLength)
             | ($sequence));
@@ -118,13 +144,7 @@ class Snowflake
      */
     public function getCurrentMillisecond(): int
     {
-        return floor(
-            (
-                $this->timeResolver === null
-                    ? microtime(true)
-                    : call_user_func($this->timeResolver)
-            ) * 1000
-        ) | 0;
+        return floor(microtime(true) * 1000) | 0;
     }
 
     /**
@@ -193,28 +213,6 @@ class Snowflake
     public function getDefaultSequenceResolver(): SequenceResolver
     {
         return $this->defaultSequenceResolver ?: $this->defaultSequenceResolver = new RandomSequenceResolver();
-    }
-
-    /**
-     * Set the time resolver.
-     *
-     * @param  (Closure(): float)|null  $timeResolver
-     */
-    public function setCurrentTimeResolver(Closure|null $timeResolver): self
-    {
-        $this->timeResolver = $timeResolver;
-
-        return $this;
-    }
-
-    /**
-     * Get the time resolver.
-     *
-     * @return (Closure(): float)|null
-     */
-    public function getCurrentTimeResolver(): Closure|null
-    {
-        return $this->timeResolver;
     }
 
     /**

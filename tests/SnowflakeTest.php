@@ -13,9 +13,11 @@ declare(strict_types=1);
 namespace Tests;
 
 use Closure;
+use DateTime;
 use Godruoyi\Snowflake\RandomSequenceResolver;
 use Godruoyi\Snowflake\SequenceResolver;
 use Godruoyi\Snowflake\Snowflake;
+use Godruoyi\Snowflake\SnowflakeException;
 
 class SnowflakeTest extends TestCase
 {
@@ -210,28 +212,6 @@ class SnowflakeTest extends TestCase
         $this->assertTrue($seq(0) === 999);
     }
 
-    public function test_time_resolver(): void
-    {
-        $snowflake = new Snowflake(999, 20);
-
-        // Same contract as microtime(true): seconds since Unix epoch (float).
-        // Pick an absolute instant in ms, as if derived from a row's created_at.
-        $currentMs = 2_832_794_913_314;
-        $unixSeconds = $currentMs / 1000.0;
-
-        $snowflake->setCurrentTimeResolver(static function () use ($unixSeconds): float {
-            return $unixSeconds;
-        });
-
-        $resolver = $snowflake->getCurrentTimeResolver();
-        $this->assertInstanceOf(Closure::class, $resolver);
-        $this->assertSame($unixSeconds, $resolver());
-
-        $id = $snowflake->id();
-        $expectedTs = (int) floor($unixSeconds * 1000) - (int) $snowflake->getStartTimeStamp();
-        $this->assertSame($expectedTs, $snowflake->parseId($id, true)['timestamp']);
-    }
-
     public function test_get_sequence_resolver(): void
     {
         $snowflake = new Snowflake(999, 20);
@@ -286,5 +266,49 @@ class SnowflakeTest extends TestCase
         });
 
         $this->assertNotEmpty($snowflake->id());
+    }
+
+    /** @dataProvider idForTimestampDataProvider */
+    public function test_id_for_timestamp(DateTime|int $dt): void
+    {
+        $snowflake = new Snowflake(10, 1);
+        $snowflake->setStartTimeStamp((new DateTime('2026-04-22T00:00:00.000Z'))->getTimestamp() * 1000);
+        $id = $snowflake->idForTimestamp($dt);
+        $parsed = $snowflake->parseId($id, true);
+        $this->assertEquals(10, $parsed['datacenter']);
+        $this->assertEquals(1, $parsed['workerid']);
+        $timestamp = $parsed['timestamp'];
+
+        $parsedDt = new DateTime();
+        $parsedDt->setTimestamp($timestamp);
+        $this->assertEquals(60 * 60 * 1000, $parsedDt->getTimestamp());
+    }
+
+    public static function idForTimestampDataProvider(): array
+    {
+        return [
+            'datetime' => [new DateTime('2026-04-22T01:00:00.000Z')],
+            'timestamp' => [strtotime('2026-04-22T01:00:00.000Z') * 1000],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidIdForTimestampDataProvider
+     */
+    public function test_cannot_create_id_for_timestamp_when_timestamp_is_before_start_time(DateTime|int $invalidDt): void
+    {
+        $this->expectException(SnowflakeException::class);
+        $this->expectExceptionMessage('The provided timestamp cannot be earlier than the start time');
+        $snowflake = new Snowflake(10, 1);
+        $snowflake->setStartTimeStamp((new DateTime('2026-04-22T00:00:00.000Z'))->getTimestamp() * 1000);
+        $snowflake->idForTimestamp($invalidDt);
+    }
+
+    public static function invalidIdForTimestampDataProvider(): array
+    {
+        return [
+            'as datetime' => [new DateTime('2025-01-01T00:00:00.000Z')],
+            'as timestamp' => [strtotime('1900-01-01') * 1000],
+        ];
     }
 }

@@ -104,7 +104,35 @@ $snowflake->setSequenceResolver(new \Godruoyi\Snowflake\RandomSequenceResolver);
 $snowflake->id();
 ```
 
-5. Use Sonyflake
+5. Configuring bit lengths for worker ID, datacenter, and sequence (optional).
+
+By default, the Snowflake structure uses 5 bits for datacenter, 5 bits for worker ID, and 12 bits for sequence number. These can be customized. The constraint is that `datacenterBitLength + workerIdBitLength + sequenceBitLength` must not exceed 22 (to keep at least 41 bits for the timestamp).
+
+```php
+$snowflake = new \Godruoyi\Snowflake\Snowflake(1, 1);
+$snowflake
+    ->setSequenceBitLength(6)    // 2^6-1 = 63 sequences per millisecond
+    ->setWorkerIdBitLength(6)    // up to 63 workers
+    ->setDatacenterBitLength(4); // up to 15 datacenters
+
+$snowflake->id();
+```
+
+> When changing bit lengths, reduce `sequenceBitLength` before increasing `workerIdBitLength` or `datacenterBitLength`, to avoid temporarily exceeding the 22-bit total limit.
+
+6. Configuring max and min sequence numbers (optional).
+
+```php
+$snowflake = new \Godruoyi\Snowflake\Snowflake;
+$snowflake->setMaxSequenceNumber(100); // limit sequences to 0-100 per millisecond
+$snowflake->setMinSequenceNumber(5);   // reserve sequence numbers 0-4 (e.g. for clock rollback)
+
+$snowflake->id();
+```
+
+> Set `maxSequenceNumber` to `0` to automatically use the maximum value derived from the sequence bit length (default behavior).
+
+7. Use Sonyflake
 
 ```php
 $sonyflake = new \Godruoyi\Snowflake\Sonyflake;

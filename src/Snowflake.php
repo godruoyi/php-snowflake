@@ -28,6 +28,31 @@ class Snowflake
     public const MAX_SEQUENCE_SIZE = (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH));
 
     /**
+     * The worker ID bit length (configurable, default: MAX_WORKID_LENGTH).
+     */
+    protected int $workerIdBitLength = self::MAX_WORKID_LENGTH;
+
+    /**
+     * The datacenter bit length (configurable, default: MAX_DATACENTER_LENGTH).
+     */
+    protected int $datacenterBitLength = self::MAX_DATACENTER_LENGTH;
+
+    /**
+     * The sequence number bit length (configurable, default: MAX_SEQUENCE_LENGTH).
+     */
+    protected int $sequenceBitLength = self::MAX_SEQUENCE_LENGTH;
+
+    /**
+     * The maximum sequence number per millisecond (0 = use max from bit length).
+     */
+    protected int $maxSequenceNumber = 0;
+
+    /**
+     * The minimum sequence number per millisecond.
+     */
+    protected int $minSequenceNumber = 0;
+
+    /**
      * The data center id.
      */
     protected int $datacenter;
@@ -71,7 +96,7 @@ class Snowflake
     public function id(): string
     {
         $currentTime = $this->getCurrentMillisecond();
-        while (($sequence = $this->callResolver($currentTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
+        while (($sequence = $this->callResolver($currentTime)) > $this->getMaxSequenceNumber()) {
             usleep(1);
             $currentTime = $this->getCurrentMillisecond();
         }
@@ -99,7 +124,7 @@ class Snowflake
         }
 
         // Get sequence number (auto-increment if overflow)
-        while (($sequence = $this->callResolver($currentTime)) > (-1 ^ (-1 << self::MAX_SEQUENCE_LENGTH))) {
+        while (($sequence = $this->callResolver($currentTime)) > $this->getMaxSequenceNumber()) {
             $currentTime++;
         }
 
@@ -108,9 +133,9 @@ class Snowflake
 
     protected function buildId(int $currentTime, float|int $startTime, int $sequence): string
     {
-        $workerLeftMoveLength = self::MAX_SEQUENCE_LENGTH;
-        $datacenterLeftMoveLength = self::MAX_WORKID_LENGTH + $workerLeftMoveLength;
-        $timestampLeftMoveLength = self::MAX_DATACENTER_LENGTH + $datacenterLeftMoveLength;
+        $workerLeftMoveLength = $this->sequenceBitLength;
+        $datacenterLeftMoveLength = $this->workerIdBitLength + $workerLeftMoveLength;
+        $timestampLeftMoveLength = $this->datacenterBitLength + $datacenterLeftMoveLength;
 
         return (string) ((($currentTime - $startTime) << $timestampLeftMoveLength)
             | ($this->datacenter << $datacenterLeftMoveLength)
@@ -127,11 +152,17 @@ class Snowflake
     {
         $id = decbin((int) $id);
 
+        $seqLen = $this->sequenceBitLength;
+        $workerLen = $this->workerIdBitLength;
+        $dcLen = $this->datacenterBitLength;
+        $workerAndSeqLen = $workerLen + $seqLen;
+        $totalLen = $dcLen + $workerAndSeqLen;
+
         $data = [
-            'timestamp' => substr($id, 0, -22),
-            'sequence' => substr($id, -12),
-            'workerid' => substr($id, -17, 5),
-            'datacenter' => substr($id, -22, 5),
+            'timestamp' => substr($id, 0, -$totalLen),
+            'sequence' => substr($id, -$seqLen),
+            'workerid' => substr($id, -$workerAndSeqLen, $workerLen),
+            'datacenter' => substr($id, -$totalLen, $dcLen),
         ];
 
         return $transform ? array_map(static function ($value) {
@@ -212,7 +243,164 @@ class Snowflake
      */
     public function getDefaultSequenceResolver(): SequenceResolver
     {
-        return $this->defaultSequenceResolver ?: $this->defaultSequenceResolver = new RandomSequenceResolver();
+        if ($this->defaultSequenceResolver) {
+            return $this->defaultSequenceResolver;
+        }
+
+        $resolver = new RandomSequenceResolver();
+        $resolver->setMaxSequence($this->getMaxSequenceNumber());
+        $resolver->setMinSequence($this->getMinSequenceNumber());
+
+        return $this->defaultSequenceResolver = $resolver;
+    }
+
+    /**
+     * Set the worker ID bit length.
+     *
+     * @throws SnowflakeException
+     */
+    public function setWorkerIdBitLength(int $length): self
+    {
+        if ($length < 1 || $length > 15) {
+            throw new SnowflakeException('WorkerIdBitLength must be between 1 and 15');
+        }
+
+        if ($this->datacenterBitLength + $length + $this->sequenceBitLength > 22) {
+            throw new SnowflakeException('The sum of datacenterBitLength, workerIdBitLength, and sequenceBitLength must not exceed 22');
+        }
+
+        $this->workerIdBitLength = $length;
+        $this->defaultSequenceResolver = null;
+
+        return $this;
+    }
+
+    /**
+     * Get the worker ID bit length.
+     */
+    public function getWorkerIdBitLength(): int
+    {
+        return $this->workerIdBitLength;
+    }
+
+    /**
+     * Set the datacenter bit length.
+     *
+     * @throws SnowflakeException
+     */
+    public function setDatacenterBitLength(int $length): self
+    {
+        if ($length < 0 || $length > 15) {
+            throw new SnowflakeException('DatacenterBitLength must be between 0 and 15');
+        }
+
+        if ($length + $this->workerIdBitLength + $this->sequenceBitLength > 22) {
+            throw new SnowflakeException('The sum of datacenterBitLength, workerIdBitLength, and sequenceBitLength must not exceed 22');
+        }
+
+        $this->datacenterBitLength = $length;
+        $this->defaultSequenceResolver = null;
+
+        return $this;
+    }
+
+    /**
+     * Get the datacenter bit length.
+     */
+    public function getDatacenterBitLength(): int
+    {
+        return $this->datacenterBitLength;
+    }
+
+    /**
+     * Set the sequence number bit length.
+     *
+     * @throws SnowflakeException
+     */
+    public function setSequenceBitLength(int $length): self
+    {
+        if ($length < 3 || $length > 21) {
+            throw new SnowflakeException('SequenceBitLength must be between 3 and 21');
+        }
+
+        if ($this->datacenterBitLength + $this->workerIdBitLength + $length > 22) {
+            throw new SnowflakeException('The sum of datacenterBitLength, workerIdBitLength, and sequenceBitLength must not exceed 22');
+        }
+
+        $this->sequenceBitLength = $length;
+        $this->defaultSequenceResolver = null;
+
+        return $this;
+    }
+
+    /**
+     * Get the sequence number bit length.
+     */
+    public function getSequenceBitLength(): int
+    {
+        return $this->sequenceBitLength;
+    }
+
+    /**
+     * Set the maximum sequence number per millisecond.
+     * Use 0 to automatically use the maximum value for the configured sequence bit length.
+     *
+     * @throws SnowflakeException
+     */
+    public function setMaxSequenceNumber(int $max): self
+    {
+        if ($max < 0) {
+            throw new SnowflakeException('MaxSequenceNumber must be a non-negative integer');
+        }
+
+        $maxFromBitLength = -1 ^ (-1 << $this->sequenceBitLength);
+        if ($max > $maxFromBitLength) {
+            throw new SnowflakeException(sprintf(
+                'MaxSequenceNumber must not exceed %d (2^%d - 1) for the current sequence bit length',
+                $maxFromBitLength,
+                $this->sequenceBitLength
+            ));
+        }
+
+        $this->maxSequenceNumber = $max;
+        $this->defaultSequenceResolver = null;
+
+        return $this;
+    }
+
+    /**
+     * Get the effective maximum sequence number per millisecond.
+     */
+    public function getMaxSequenceNumber(): int
+    {
+        return $this->maxSequenceNumber > 0
+            ? $this->maxSequenceNumber
+            : (-1 ^ (-1 << $this->sequenceBitLength));
+    }
+
+    /**
+     * Set the minimum sequence number per millisecond.
+     *
+     * @throws SnowflakeException
+     */
+    public function setMinSequenceNumber(int $min): self
+    {
+        if ($min < 0) {
+            throw new SnowflakeException('MinSequenceNumber must be a non-negative integer');
+        }
+
+        $this->minSequenceNumber = $min;
+        $this->defaultSequenceResolver = null;
+
+        return $this;
+    }
+
+    /**
+     * Get the minimum sequence number per millisecond.
+     */
+    public function getMinSequenceNumber(): int
+    {
+        return $this->minSequenceNumber;
     }
 
     /**

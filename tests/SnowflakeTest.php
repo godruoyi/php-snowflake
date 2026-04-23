@@ -406,6 +406,15 @@ class SnowflakeTest extends TestCase
         $snowflake->setMaxSequenceNumber(64);
     }
 
+    public function test_set_max_sequence_number_less_than_min_throws(): void
+    {
+        $this->expectException(SnowflakeException::class);
+        $this->expectExceptionMessage('MaxSequenceNumber must be greater than MinSequenceNumber');
+        $snowflake = new Snowflake(1, 1);
+        $snowflake->setMinSequenceNumber(10);
+        $snowflake->setMaxSequenceNumber(5);
+    }
+
     public function test_set_min_sequence_number(): void
     {
         $snowflake = new Snowflake(1, 1);
@@ -420,10 +429,19 @@ class SnowflakeTest extends TestCase
         (new Snowflake())->setMinSequenceNumber(-1);
     }
 
+    public function test_set_min_sequence_number_greater_than_max_throws(): void
+    {
+        $this->expectException(SnowflakeException::class);
+        $this->expectExceptionMessage('MinSequenceNumber must be less than MaxSequenceNumber');
+        $snowflake = new Snowflake(1, 1);
+        $snowflake->setMaxSequenceNumber(10);
+        $snowflake->setMinSequenceNumber(10);
+    }
+
     public function test_custom_bit_lengths_produce_valid_ids(): void
     {
         $snowflake = new Snowflake(1, 1);
-        // 4 bits datacenter + 6 bits workerId + 6 bits sequence = 16 bits (47 bits for timestamp)
+        // 4 bits datacenter + 6 bits workerId + 6 bits sequence = 16 bits (48 bits for timestamp)
         $snowflake->setSequenceBitLength(6)->setDatacenterBitLength(4)->setWorkerIdBitLength(6);
 
         $id = $snowflake->id();

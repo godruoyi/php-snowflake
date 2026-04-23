@@ -362,6 +362,10 @@ class Snowflake
             ));
         }
 
+        if ($max > 0 && $max <= $this->minSequenceNumber) {
+            throw new SnowflakeException('MaxSequenceNumber must be greater than MinSequenceNumber');
+        }
+
         $this->maxSequenceNumber = $max;
         $this->defaultSequenceResolver = null;
 
@@ -387,6 +391,10 @@ class Snowflake
     {
         if ($min < 0) {
             throw new SnowflakeException('MinSequenceNumber must be a non-negative integer');
+        }
+
+        if ($this->maxSequenceNumber > 0 && $min >= $this->maxSequenceNumber) {
+            throw new SnowflakeException('MinSequenceNumber must be less than MaxSequenceNumber');
         }
 
         $this->minSequenceNumber = $min;

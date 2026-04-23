@@ -315,6 +315,10 @@ class Snowflake
     /**
      * Set the sequence number bit length.
      *
+     * The only hard constraint is that datacenterBitLength + workerIdBitLength + length ≤ 62.
+     * Very small values (e.g. 1–2 bits) severely limit throughput per millisecond; the caller
+     * is responsible for choosing a value appropriate for the expected load.
+     *
      * @throws SnowflakeException
      */
     public function setSequenceBitLength(int $length): self

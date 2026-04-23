@@ -323,9 +323,12 @@ class SnowflakeTest extends TestCase
     public function test_set_worker_id_bit_length(): void
     {
         $snowflake = new Snowflake(1, 1);
-        // Must reduce sequenceBitLength first to make room for a larger workerIdBitLength
-        $snowflake->setSequenceBitLength(6)->setWorkerIdBitLength(6);
+        $snowflake->setWorkerIdBitLength(6);
         $this->assertSame(6, $snowflake->getWorkerIdBitLength());
+
+        // values above the old 15-bit cap are now accepted
+        $snowflake->setWorkerIdBitLength(20);
+        $this->assertSame(20, $snowflake->getWorkerIdBitLength());
 
         // zero is valid (single-node / no worker field)
         $snowflake2 = new Snowflake(0, 0);
@@ -333,34 +336,37 @@ class SnowflakeTest extends TestCase
         $this->assertSame(0, $snowflake2->getWorkerIdBitLength());
     }
 
-    public function test_set_worker_id_bit_length_out_of_range_throws(): void
+    public function test_set_worker_id_bit_length_negative_throws(): void
     {
         $this->expectException(SnowflakeException::class);
-        $this->expectExceptionMessage('WorkerIdBitLength must be between 0 and 15');
-        (new Snowflake())->setWorkerIdBitLength(16);
+        $this->expectExceptionMessage('WorkerIdBitLength must be a non-negative integer');
+        (new Snowflake())->setWorkerIdBitLength(-1);
     }
 
     public function test_set_worker_id_bit_length_exceeds_total_throws(): void
     {
         $this->expectException(SnowflakeException::class);
-        $this->expectExceptionMessage('must not exceed 22');
-        // Default dc=5, seq=12; setting worker=8 makes 5+8+12=25 > 22
-        (new Snowflake())->setWorkerIdBitLength(8);
+        $this->expectExceptionMessage('must not exceed 62');
+        // Default dc=5, seq=12; setting worker=46 makes 5+46+12=63 > 62
+        (new Snowflake())->setWorkerIdBitLength(46);
     }
 
     public function test_set_datacenter_bit_length(): void
     {
         $snowflake = new Snowflake(1, 1);
-        // Reduce sequenceBitLength first to make room
-        $snowflake->setSequenceBitLength(6)->setDatacenterBitLength(4);
+        $snowflake->setDatacenterBitLength(4);
         $this->assertSame(4, $snowflake->getDatacenterBitLength());
+
+        // values above the old 15-bit cap are now accepted
+        $snowflake->setDatacenterBitLength(20);
+        $this->assertSame(20, $snowflake->getDatacenterBitLength());
     }
 
-    public function test_set_datacenter_bit_length_out_of_range_throws(): void
+    public function test_set_datacenter_bit_length_negative_throws(): void
     {
         $this->expectException(SnowflakeException::class);
-        $this->expectExceptionMessage('DatacenterBitLength must be between 0 and 15');
-        (new Snowflake())->setDatacenterBitLength(16);
+        $this->expectExceptionMessage('DatacenterBitLength must be a non-negative integer');
+        (new Snowflake())->setDatacenterBitLength(-1);
     }
 
     public function test_set_sequence_bit_length(): void
@@ -370,21 +376,26 @@ class SnowflakeTest extends TestCase
         $this->assertSame(6, $snowflake->getSequenceBitLength());
         // Max sequence should update accordingly: 2^6-1 = 63
         $this->assertSame(63, $snowflake->getMaxSequenceNumber());
+
+        // values above the old 21-bit cap are now accepted (as long as sum ≤ 62)
+        $snowflake2 = new Snowflake(0, 0);
+        $snowflake2->setDatacenterBitLength(0)->setWorkerIdBitLength(0)->setSequenceBitLength(30);
+        $this->assertSame(30, $snowflake2->getSequenceBitLength());
     }
 
-    public function test_set_sequence_bit_length_out_of_range_throws(): void
+    public function test_set_sequence_bit_length_less_than_one_throws(): void
     {
         $this->expectException(SnowflakeException::class);
-        $this->expectExceptionMessage('SequenceBitLength must be between 3 and 21');
-        (new Snowflake())->setSequenceBitLength(22);
+        $this->expectExceptionMessage('SequenceBitLength must be at least 1');
+        (new Snowflake())->setSequenceBitLength(0);
     }
 
     public function test_set_sequence_bit_length_exceeds_total_throws(): void
     {
         $this->expectException(SnowflakeException::class);
-        $this->expectExceptionMessage('must not exceed 22');
-        // Default dc=5, worker=5; setting seq=13 makes 5+5+13=23 > 22
-        (new Snowflake())->setSequenceBitLength(13);
+        $this->expectExceptionMessage('must not exceed 62');
+        // Default dc=5, worker=5; setting seq=53 makes 5+5+53=63 > 62
+        (new Snowflake())->setSequenceBitLength(53);
     }
 
     public function test_set_max_sequence_number(): void

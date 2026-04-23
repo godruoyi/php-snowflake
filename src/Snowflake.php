@@ -261,12 +261,12 @@ class Snowflake
      */
     public function setWorkerIdBitLength(int $length): self
     {
-        if ($length < 0 || $length > 15) {
-            throw new SnowflakeException('WorkerIdBitLength must be between 0 and 15');
+        if ($length < 0) {
+            throw new SnowflakeException('WorkerIdBitLength must be a non-negative integer');
         }
 
-        if ($this->datacenterBitLength + $length + $this->sequenceBitLength > 22) {
-            throw new SnowflakeException('The sum of datacenterBitLength, workerIdBitLength, and sequenceBitLength must not exceed 22');
+        if ($this->datacenterBitLength + $length + $this->sequenceBitLength > 62) {
+            throw new SnowflakeException('The sum of datacenterBitLength, workerIdBitLength, and sequenceBitLength must not exceed 62');
         }
 
         $this->workerIdBitLength = $length;
@@ -290,12 +290,12 @@ class Snowflake
      */
     public function setDatacenterBitLength(int $length): self
     {
-        if ($length < 0 || $length > 15) {
-            throw new SnowflakeException('DatacenterBitLength must be between 0 and 15');
+        if ($length < 0) {
+            throw new SnowflakeException('DatacenterBitLength must be a non-negative integer');
         }
 
-        if ($length + $this->workerIdBitLength + $this->sequenceBitLength > 22) {
-            throw new SnowflakeException('The sum of datacenterBitLength, workerIdBitLength, and sequenceBitLength must not exceed 22');
+        if ($length + $this->workerIdBitLength + $this->sequenceBitLength > 62) {
+            throw new SnowflakeException('The sum of datacenterBitLength, workerIdBitLength, and sequenceBitLength must not exceed 62');
         }
 
         $this->datacenterBitLength = $length;
@@ -319,12 +319,12 @@ class Snowflake
      */
     public function setSequenceBitLength(int $length): self
     {
-        if ($length < 3 || $length > 21) {
-            throw new SnowflakeException('SequenceBitLength must be between 3 and 21');
+        if ($length < 1) {
+            throw new SnowflakeException('SequenceBitLength must be at least 1');
         }
 
-        if ($this->datacenterBitLength + $this->workerIdBitLength + $length > 22) {
-            throw new SnowflakeException('The sum of datacenterBitLength, workerIdBitLength, and sequenceBitLength must not exceed 22');
+        if ($this->datacenterBitLength + $this->workerIdBitLength + $length > 62) {
+            throw new SnowflakeException('The sum of datacenterBitLength, workerIdBitLength, and sequenceBitLength must not exceed 62');
         }
 
         $this->sequenceBitLength = $length;

@@ -106,7 +106,7 @@ $snowflake->id();
 
 5. Configuring bit lengths for worker ID, datacenter, and sequence (optional).
 
-By default, the Snowflake structure uses 5 bits for datacenter, 5 bits for worker ID, and 12 bits for sequence number. These can be customized. The constraint is that `datacenterBitLength + workerIdBitLength + sequenceBitLength` must not exceed 22 (the remaining bits are used for the timestamp). Both `datacenterBitLength` and `workerIdBitLength` may be set to `0` for single-node deployments.
+By default, the Snowflake structure uses 5 bits for datacenter, 5 bits for worker ID, and 12 bits for sequence number. These can be freely customized — the only hard constraint is that `datacenterBitLength + workerIdBitLength + sequenceBitLength` must not exceed 62 (leaving at least 1 bit for the timestamp). Both `datacenterBitLength` and `workerIdBitLength` may be set to `0` for single-node deployments.
 
 ```php
 $snowflake = new \Godruoyi\Snowflake\Snowflake(1, 1);
@@ -130,7 +130,7 @@ $snowflake
 $snowflake->id();
 ```
 
-> When changing bit lengths, reduce `sequenceBitLength` before increasing `workerIdBitLength` or `datacenterBitLength`, to avoid temporarily exceeding the 22-bit total limit.
+> The setter order does not matter — each call validates the current total against the 62-bit budget independently.
 
 6. Configuring max and min sequence numbers (optional).
 
